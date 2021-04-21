@@ -7,51 +7,14 @@ export default {
   components: {
     HelloWorld,
   },
-  data() {
-    return {
-      num : 0
-    }
-  },
-  created() {
-    if(localStorage.getItem('num')){
-      this.num = parseInt(localStorage.getItem('num'))
-    }
-  },
-  methods: {
-    handleClick() {
-      this.num++
-      localStorage.setItem('num', this.num)
-
-    }
-  }
 };
 </script>
-
 
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" /> 
-    <p>Current Number : {{num}}</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <p>Test</p>
-    <button @click="handleClick">Increment</button>
+    <HelloWorld msg="Welcome to Your Vue.js App" />
   </div>
 </template>
 
-
-<style lang="scss" module>
-</style>
+<style lang="scss" module></style>
