@@ -33,21 +33,21 @@ export default {
     <img alt="Vue logo" src="../assets/logo.png" />
     <HelloWorld msg="Welcome to Your Vue.js App" /> 
     <p>Current Number : {{num}}</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
-    <p>Check</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
+    <p>Test</p>
     <button @click="handleClick">Increment</button>
   </div>
 </template>
