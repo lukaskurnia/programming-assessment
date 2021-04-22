@@ -1,9 +1,19 @@
+<script>
+import Layout from "./layout";
+export default {
+  name: "App",
+  components: {
+    Layout,
+  },
+};
+</script>
+
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
-  <router-view />
+  <layout>
+    <transition name="fade" mode="out-in">
+      <router-view />
+    </transition>
+  </layout>
 </template>
 
 <style lang="scss">
@@ -13,23 +23,22 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-
 * {
   padding: 0;
   margin: 0;
   box-sizing: inherit;
   font-family: "Open Sans", sans-serif;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.3s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
 }
 </style>
