@@ -6,7 +6,11 @@ export default {
 
 <template>
   <div :class="$style.navbar">
-    <img :class="$style.logo" src="@/assets/logo-kuliah.png" />
+    <img
+      @click="$router.push({ name: 'Home' })"
+      :class="$style.logo"
+      src="@/assets/logo-kuliah.png"
+    />
     <div :class="$style.accountGroup">
       <font-awesome-icon :class="$style.iconUser" icon="user-circle" />
       <font-awesome-icon :class="$style.iconChevron" icon="chevron-down" />
@@ -32,6 +36,7 @@ export default {
     width: 100%;
     max-width: 200px;
     margin-left: 1rem;
+    cursor: pointer;
   }
 
   .accountGroup {

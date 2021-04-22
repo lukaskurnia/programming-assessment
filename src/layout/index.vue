@@ -4,14 +4,35 @@ import Navbar from "./components/Navbar";
 export default {
   name: "Layout",
   components: { Sidebar, Navbar },
+  data() {
+    return {
+      isSidebar: false,
+      isNavbar: false,
+    };
+  },
+  computed: {
+    layoutClass() {
+      const { layout, noSidebar } = this.$style;
+      if (this.isSidebar) {
+        return [layout];
+      }
+      return [noSidebar];
+    },
+  },
+  watch: {
+    $route(to) {
+      this.isSidebar = to.meta.sidebar;
+      this.isNavbar = to.meta.navbar;
+    },
+  },
 };
 </script>
 
 <template>
-  <div :class="$style.layout">
-    <Sidebar />
+  <div :class="layoutClass">
+    <Sidebar v-if="isSidebar" />
     <div :class="$style.container">
-      <Navbar />
+      <Navbar v-if="isNavbar" />
       <slot></slot>
     </div>
   </div>
@@ -23,6 +44,10 @@ export default {
   grid-template-columns: 5% auto;
   width: 100%;
   background: #eef5f9;
+}
+
+.noSidebar {
+  display: initial;
 }
 
 .container {
