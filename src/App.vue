@@ -1,7 +1,17 @@
+<script>
+import Layout from "./layout";
+export default {
+  name: "App",
+  components: {
+    Layout,
+  },
+};
+</script>
+
 <template>
-  <div>
+  <layout>
     <router-view />
-  </div>
+  </layout>
 </template>
 
 <style lang="scss">
