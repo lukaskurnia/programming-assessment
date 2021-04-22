@@ -10,9 +10,11 @@ export default {
 
 <template>
   <layout>
-    <transition name="fade" mode="out-in">
-      <router-view />
-    </transition>
+    <router-view v-slot="{ Component }">
+      <transition name="fade" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
   </layout>
 </template>
 
