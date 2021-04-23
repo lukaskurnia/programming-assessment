@@ -12,8 +12,8 @@ const routes = [
     },
   },
   {
-    path: "/about",
-    name: "About",
+    path: "/event/:id_event",
+    name: "Event",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
@@ -21,7 +21,7 @@ const routes = [
       navbar: true,
     },
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+      import(/* webpackChunkName: "about" */ "../views/Event.vue"),
   },
   {
     path: "/404",
