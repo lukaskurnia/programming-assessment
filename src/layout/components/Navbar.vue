@@ -21,6 +21,7 @@ export default {
 <style lang="scss" module>
 .navbar {
   position: sticky;
+  z-index: 1;
   top: 0;
   height: 4rem;
   width: 100%;
