@@ -33,7 +33,7 @@ export default {
             :key="idx"
           >
             <AssignmentCard
-              @click="navigate(assignment.id)"
+              @click="navigate(assignment.id_event)"
               :grade="assignment.grade"
               :title="assignment.title"
             />
@@ -50,7 +50,7 @@ export default {
             :key="idx"
           >
             <AssignmentCard
-              @click="navigate(assignment.id)"
+              @click="navigate(assignment.id_event)"
               :grade="assignment.grade"
               :title="assignment.title"
               :day="assignment.day"

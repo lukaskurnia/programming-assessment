@@ -31,7 +31,7 @@
 .ctaText {
   cursor: pointer;
   font-size: 1rem;
-  color: #01316d;
+  color: $primary;
   text-decoration: underline;
   margin-top: 2rem;
 }

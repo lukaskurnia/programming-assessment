@@ -20,8 +20,7 @@ const routes = [
     meta: {
       navbar: true,
     },
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Event.vue"),
+    component: () => import(/* webpackChunkName: "about" */ "../views/Event"),
   },
   {
     path: "/404",

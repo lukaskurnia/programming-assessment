@@ -5,6 +5,9 @@ import {
   faChevronDown,
   faChevronCircleRight,
   faCheckCircle,
+  faArrowLeft,
+  faArrowCircleLeft,
+  faArrowCircleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -12,5 +15,8 @@ library.add(
   faUserCircle,
   faChevronDown,
   faChevronCircleRight,
-  faCheckCircle
+  faCheckCircle,
+  faArrowLeft,
+  faArrowCircleLeft,
+  faArrowCircleRight
 );

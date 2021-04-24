@@ -61,12 +61,10 @@ export default {
 </template>
 
 <style lang="scss" module>
-$blue-1: #00316d;
-$blue-2: #0d62ac;
 .card {
   cursor: pointer;
   position: relative;
-  background: $blue-1;
+  background: $primary;
   border-radius: 1rem;
   padding: 2rem 2.5rem;
   display: flex;
@@ -75,9 +73,9 @@ $blue-2: #0d62ac;
 
   &:hover {
     transform: translateY(-2px);
-    -webkit-box-shadow: 0px 2px 8px darken($color: $blue-1, $amount: 5);
-    -moz-box-shadow: 0px 2px 8px darken($color: $blue-1, $amount: 5);
-    box-shadow: 0px 2px 8px darken($color: $blue-1, $amount: 5);
+    -webkit-box-shadow: 0px 2px 8px darken($color: $primary, $amount: 5);
+    -moz-box-shadow: 0px 2px 8px darken($color: $primary, $amount: 5);
+    box-shadow: 0px 2px 8px darken($color: $primary, $amount: 5);
   }
 }
 .informationBox {
@@ -135,7 +133,7 @@ $blue-2: #0d62ac;
     border-radius: 12px 12px 0 0;
     font-size: 1rem;
     text-align: center;
-    background: $blue-2;
+    background: $secondary;
     padding: 0.2rem;
     color: white;
   }
@@ -147,7 +145,7 @@ $blue-2: #0d62ac;
     justify-content: center;
     align-items: center;
     background: #e8ebe9;
-    color: $blue-1;
+    color: $primary;
     font-size: 3rem;
     font-weight: bold;
   }

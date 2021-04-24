@@ -1,0 +1,61 @@
+$blue: #00316d;
+.btn {
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.875rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  font-weight: bold;
+
+  &.disabled,
+  &[disabled] {
+    filter: grayscale(10);
+    opacity: 1;
+    cursor: not-allowed;
+  }
+
+  &:not(.no-hover):hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 5px rgba(black, 0.3);
+    &.btn.disabled,
+    &.btn[disabled] {
+      box-shadow: none;
+      transform: translateY(0);
+    }
+  }
+
+  &:focus {
+    border: none;
+    outline: none;
+  }
+
+  &-primary {
+    background: $blue;
+    color: white;
+    &:not(.no-hover):hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 5px rgba($blue, 0.3);
+      &.btn.disabled,
+      &.btn[disabled] {
+        box-shadow: none;
+        transform: translateY(0);
+      }
+    }
+
+    &--alt {
+      color: $blue;
+      background: white;
+      border: 1px solid $blue;
+      font-weight: bold;
+      &:not(.no-hover):hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 5px rgba($blue, 0.3);
+        &.btn.disabled,
+        &.btn[disabled] {
+          box-shadow: none;
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+}
