@@ -1,18 +1,18 @@
 export const UNFINISHED_ASSIGNMENTS = [
   {
-    id: 3,
+    id_event: 3,
     grade: "-",
     title: "Assignment 3",
     isFinished: false,
   },
   {
-    id: 4,
+    id_event: 4,
     grade: "-",
     title: "Assignment 4",
     isFinished: false,
   },
   {
-    id: 5,
+    id_event: 5,
     grade: "-",
     title: "Assignment 5",
     isFinished: false,
@@ -21,7 +21,7 @@ export const UNFINISHED_ASSIGNMENTS = [
 
 export const FINISHED_ASSIGNMENTS = [
   {
-    id: 2,
+    id_event: 2,
     grade: 70,
     title: "Assignment 2",
     isFinished: true,
@@ -30,7 +30,7 @@ export const FINISHED_ASSIGNMENTS = [
     time: "01:00 PM",
   },
   {
-    id: 1,
+    id_event: 1,
     grade: 100,
     title: "Assignment 1",
     isFinished: true,
