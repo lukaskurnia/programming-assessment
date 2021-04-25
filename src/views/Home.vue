@@ -1,17 +1,53 @@
 <script>
 import AssignmentCard from "@/components/AssignmentCard";
-import { UNFINISHED_ASSIGNMENTS, FINISHED_ASSIGNMENTS } from "@/constants/home";
+import ResetButton from "@/components/ResetButton";
+import { EXAMS } from "@/constants/exam";
 export default {
   name: "Home",
-  components: { AssignmentCard },
+  components: { AssignmentCard, ResetButton },
   data() {
     return {
       course: "IF 1210 - Dasar Pemrograman",
-      unfinished: UNFINISHED_ASSIGNMENTS,
-      finished: FINISHED_ASSIGNMENTS,
+      exams: EXAMS,
     };
   },
+  created() {
+    this.initialize();
+  },
+  computed: {
+    unfinished() {
+      const data = this.exams.filter(el => {
+        return el.finished_at === null;
+      });
+      // sort ascending by id_event
+      data.sort((a, b) => a.id_event - b.id_event);
+      return data;
+    },
+    finished() {
+      const data = this.exams.filter(el => {
+        return el.finished_at !== null;
+      });
+      data.sort((a, b) => {
+        // sort by last finished
+        if (a.finished_at > b.finished_at) {
+          return -1;
+        }
+        if (a.finished_at < b.finished_at) {
+          return 1;
+        }
+        return 0;
+      });
+      return data;
+    },
+  },
   methods: {
+    initialize() {
+      if (!localStorage.getItem("exam")) {
+        localStorage.setItem("exam", JSON.stringify(this.exams));
+      } else {
+        this.exams = JSON.parse(localStorage.getItem("exam"));
+      }
+    },
     navigate(id) {
       this.$router.push({ name: "Event", params: { id_event: id } });
     },
@@ -53,21 +89,20 @@ export default {
               @click="navigate(assignment.id_event)"
               :grade="assignment.grade"
               :title="assignment.title"
-              :day="assignment.day"
-              :time="assignment.time"
-              :date="assignment.date"
-              :is-finished="assignment.isFinished"
+              :finished="assignment.finished_at"
             />
           </div>
         </div>
       </div>
     </div>
+    <ResetButton />
   </div>
 </template>
 
 <style lang="scss" module>
 .home {
   padding: 2rem;
+  position: relative;
 }
 
 .header {
