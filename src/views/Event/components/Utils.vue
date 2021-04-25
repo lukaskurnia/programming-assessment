@@ -1,9 +1,12 @@
 <script>
+import { millisecondToTime } from "@/utils/datetime";
 import Navigation from "./Navigation";
+import Timer from "./Timer";
 export default {
   name: "Utils",
   components: {
     Navigation,
+    Timer,
   },
   props: {
     currentNumber: {
@@ -11,10 +14,58 @@ export default {
       default: 1,
     },
     questions: Array,
+    exam: Object,
+  },
+  data() {
+    return {
+      times: {
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+      },
+      duration: 310000, // 5 minute 10 second
+      remainingTimeInterval: null, // Interval
+      isTimesUp: false,
+    };
+  },
+  created() {
+    this.triggerTime();
+  },
+  beforeUnmount() {
+    clearInterval(this.remainingTimeInterval);
   },
   methods: {
     changeNumber(val) {
       this.$emit("change-number", val);
+    },
+    async triggerTime() {
+      let startTime;
+      const currentDate = new Date();
+      const currentTime = currentDate.getTime();
+      if (this.exam.started_at) {
+        startTime = this.exam.started_at;
+      } else {
+        startTime = currentTime;
+        this.$emit("update-exam", "started_at", currentTime);
+        this.$emit("update-ls");
+      }
+
+      const lastTime = startTime + this.duration;
+      let examRemainingTime = Math.max(lastTime - currentTime, 0);
+
+      this.remainingTimeInterval = setInterval(async () => {
+        examRemainingTime = Math.max(examRemainingTime - 1000, 0);
+        this.times = millisecondToTime(examRemainingTime);
+
+        if (examRemainingTime <= 0) {
+          if (this.isTimesUp === false) {
+            this.isTimesUp = true;
+            // TODO: Change to Modal
+            this.$emit("update-exam", "finished_at", currentDate.getTime());
+            this.$emit("update-ls");
+          }
+        }
+      }, 1000);
     },
   },
 };
@@ -30,8 +81,13 @@ export default {
           @change-number="changeNumber"
         />
       </div>
-      <div :class="$style.timerSection">Hai</div>
+      <div :class="$style.timerSection">
+        <div>
+          <Timer :time="times" />
+        </div>
+      </div>
     </div>
+    <p v-if="isTimesUp">Waktu habis</p>
   </div>
 </template>
 
@@ -49,5 +105,9 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: 1rem;
+}
+
+.timerSection {
+  justify-self: center;
 }
 </style>

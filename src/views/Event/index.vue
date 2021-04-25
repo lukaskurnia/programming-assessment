@@ -1,5 +1,6 @@
 <script>
 import { EVENT_DATA } from "@/constants/event";
+import { EXAMS } from "@/constants/exam";
 import Question from "./components/Question";
 import Utils from "./components/Utils";
 export default {
@@ -11,11 +12,14 @@ export default {
   data() {
     return {
       event: {},
+      currentExam: {},
+      exams: EXAMS,
       currentNumber: 1,
       totalQuestion: 1,
     };
   },
   created() {
+    this.initialize();
     this.scrollTop();
 
     // Fetch problemset
@@ -23,6 +27,10 @@ export default {
       el => el.id_event === parseInt(this.$route.params.id_event)
     );
     this.totalQuestion = this.event.questions.length;
+    // Fetch Exam
+    this.currentExam = this.exams.find(
+      el => el.id_event === parseInt(this.$route.params.id_event)
+    );
   },
   mounted() {
     // on scroll effect
@@ -43,6 +51,13 @@ export default {
     },
   },
   methods: {
+    initialize() {
+      if (!localStorage.getItem("exam")) {
+        localStorage.setItem("exam", JSON.stringify(this.exams));
+      } else {
+        this.exams = JSON.parse(localStorage.getItem("exam"));
+      }
+    },
     scrollTop() {
       window.scrollTo(0, 0);
     },
@@ -54,6 +69,15 @@ export default {
     },
     changeNumber(val) {
       this.currentNumber = val;
+    },
+    updateUserExams(key, value) {
+      const idx = this.exams.findIndex(
+        el => el.id_event === parseInt(this.$route.params.id_event)
+      );
+      this.exams[idx][key] = value;
+    },
+    updateLS() {
+      localStorage.setItem("exam", JSON.stringify(this.exams));
     },
   },
 };
@@ -93,6 +117,9 @@ export default {
         <Utils
           :current-number="currentNumber"
           :questions="event.questions"
+          :exam="currentExam"
+          @update-exam="updateUserExams"
+          @update-ls="updateLS"
           @change-number="changeNumber"
         />
       </div>
@@ -141,6 +168,8 @@ export default {
   }
 
   .content {
+    max-width: 1600px;
+    margin: auto;
     padding: 2rem;
     display: grid;
     grid-template-columns: 40% 60%;

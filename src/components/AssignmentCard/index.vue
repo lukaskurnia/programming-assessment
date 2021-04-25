@@ -1,26 +1,27 @@
 <script>
+import { toReadable } from "@/utils/datetime";
 export default {
   name: "AssignmentsCard",
   props: {
-    grade: [Number, String],
+    grade: Number,
     title: String,
-    isFinished: {
-      default: false,
-      type: Boolean,
-    },
-    day: String,
-    date: {
-      default: "",
-      type: String,
-    },
-    time: {
-      default: "",
-      type: String,
-    },
+    finished: Number,
+    // day: String,
+    // date: {
+    //   default: "",
+    //   type: String,
+    // },
+    // time: {
+    //   default: "",
+    //   type: String,
+    // },
   },
   computed: {
     datetime() {
-      return `${this.date}, ${this.time}`;
+      if (this.finished) {
+        return toReadable(this.finished);
+      }
+      return "";
     },
   },
 };
@@ -31,12 +32,12 @@ export default {
     <div :class="$style.gradeBox">
       <p :class="$style.title">Grade</p>
       <div :class="$style.grade">
-        <p>{{ grade }}</p>
+        <p>{{ grade ? grade : "-" }}</p>
       </div>
     </div>
     <div :class="$style.informationBox">
       <p :class="$style.title">{{ title }}</p>
-      <p v-if="!isFinished" :class="$style.text">
+      <p v-if="!finished" :class="$style.text">
         You haven’t finished this assignments yet
       </p>
       <div v-else>
@@ -45,13 +46,13 @@ export default {
           <font-awesome-icon :class="$style.iconCheck" icon="check-circle" />
         </p>
         <div :class="$style.time">
-          <p>Submitted {{ day }},</p>
+          <p>Submitted at,</p>
           <p>{{ datetime }}</p>
         </div>
       </div>
     </div>
     <div :class="$style.floatingGroup">
-      <p v-if="isFinished" :class="$style.review">Review</p>
+      <p v-if="finished" :class="$style.review">Review</p>
       <font-awesome-icon
         :class="$style.iconChevron"
         icon="chevron-circle-right"
@@ -104,7 +105,8 @@ export default {
 
   &Check {
     font-size: 1rem;
-    color: #72d572;
+    // color: #72d572;
+    color: $success;
     margin-left: 0.5rem;
   }
 }
