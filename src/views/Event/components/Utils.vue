@@ -63,6 +63,7 @@ export default {
             // TODO: Change to Modal
             this.$emit("update-exam", "finished_at", currentDate.getTime());
             this.$emit("update-ls");
+            alert("Times up");
           }
         }
       }, 1000);
@@ -87,7 +88,6 @@ export default {
         </div>
       </div>
     </div>
-    <p v-if="isTimesUp">Waktu habis</p>
   </div>
 </template>
 

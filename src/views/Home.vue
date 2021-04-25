@@ -1,9 +1,10 @@
 <script>
 import AssignmentCard from "@/components/AssignmentCard";
+import ResetButton from "@/components/ResetButton";
 import { EXAMS } from "@/constants/exam";
 export default {
   name: "Home",
-  components: { AssignmentCard },
+  components: { AssignmentCard, ResetButton },
   data() {
     return {
       course: "IF 1210 - Dasar Pemrograman",
@@ -29,10 +30,10 @@ export default {
       data.sort((a, b) => {
         // sort by last finished
         if (a.finished_at > b.finished_at) {
-          return 1;
+          return -1;
         }
         if (a.finished_at < b.finished_at) {
-          return -1;
+          return 1;
         }
         return 0;
       });
@@ -94,12 +95,14 @@ export default {
         </div>
       </div>
     </div>
+    <ResetButton />
   </div>
 </template>
 
 <style lang="scss" module>
 .home {
   padding: 2rem;
+  position: relative;
 }
 
 .header {

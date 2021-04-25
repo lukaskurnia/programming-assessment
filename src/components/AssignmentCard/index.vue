@@ -105,7 +105,6 @@ export default {
 
   &Check {
     font-size: 1rem;
-    // color: #72d572;
     color: $success;
     margin-left: 0.5rem;
   }
