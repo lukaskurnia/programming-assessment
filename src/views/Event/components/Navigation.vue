@@ -6,15 +6,19 @@ export default {
       type: Number,
       default: 1,
     },
-    score: {
+    totalNumber: {
       type: Number,
-      default: 0,
+      default: 5,
     },
-    tries: {
-      type: Number,
-      default: 10,
+    currentQuestion: Object,
+  },
+  computed: {
+    score() {
+      return this.currentQuestion.score || 0;
     },
-    questions: Array,
+    tries() {
+      return this.currentQuestion.tries || 10;
+    },
   },
 };
 </script>
@@ -23,16 +27,14 @@ export default {
   <div :class="$style.navigation">
     <p :class="$style.title">Navigation</p>
     <div :class="$style.numberBox">
+      <!-- idx start from 1 -->
       <div
-        @click="$emit('change-number', idx + 1)"
-        v-for="(question, idx) in questions"
+        v-for="idx in totalNumber"
+        :class="[$style.number, currentNumber === idx ? $style.current : '']"
         :key="idx"
-        :class="[
-          $style.number,
-          currentNumber - 1 === idx ? $style.current : '',
-        ]"
+        @click="$emit('change-number', idx)"
       >
-        {{ idx + 1 }}
+        {{ idx }}
       </div>
     </div>
     <p :class="$style.score">

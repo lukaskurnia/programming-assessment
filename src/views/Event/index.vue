@@ -116,7 +116,6 @@ export default {
       <div>
         <Utils
           :current-number="currentNumber"
-          :questions="event.questions"
           :duration="event.duration"
           :exam="currentExam"
           @update-exam="updateUserExams"
