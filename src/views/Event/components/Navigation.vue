@@ -10,14 +10,68 @@ export default {
       type: Number,
       default: 5,
     },
-    currentQuestion: Object,
+    // currentQuestion: Object,
+    userData: Object,
   },
   computed: {
     score() {
-      return this.currentQuestion.score || 0;
+      return this.userData.score[this.currentNumber - 1];
     },
     tries() {
-      return this.currentQuestion.tries || 10;
+      if (this.userData.status[this.currentNumber - 1] === "submit-success") {
+        return "Correct";
+      } else if (
+        this.userData.status[this.currentNumber - 1] === "submit-wrong"
+      ) {
+        if (this.userData.tries[this.currentNumber - 1] === 0) {
+          return "Incorrect";
+        }
+      } else if (
+        this.userData.status[this.currentNumber - 1] === "submit-partial"
+      ) {
+        if (this.userData.tries[this.currentNumber - 1] === 0) {
+          return "Partially correct";
+        }
+      }
+      return `Tries remaining: ${this.userData.tries[this.currentNumber - 1]}`;
+    },
+    triesClass() {
+      const { tries, successColor, wrongColor, partialColor } = this.$style;
+      let style = [tries];
+      if (this.userData.status[this.currentNumber - 1] === "submit-success") {
+        style.push(successColor);
+      } else if (
+        this.userData.status[this.currentNumber - 1] === "submit-wrong"
+      ) {
+        if (this.userData.tries[this.currentNumber - 1] === 0) {
+          style.push(wrongColor);
+        }
+      } else if (
+        this.userData.status[this.currentNumber - 1] === "submit-partial"
+      ) {
+        if (this.userData.tries[this.currentNumber - 1] === 0) {
+          style.push(partialColor);
+        }
+      }
+      return style;
+    },
+  },
+  methods: {
+    numberClass(status, num) {
+      const { number, current, successBg, wrongBg, partialBg } = this.$style;
+      let style = [number];
+      if (this.currentNumber === num) {
+        style.push(current);
+      } else {
+        if (status === "submit-success") {
+          style.push(successBg);
+        } else if (status === "submit-partial") {
+          style.push(partialBg);
+        } else if (status === "submit-wrong") {
+          style.push(wrongBg);
+        }
+      }
+      return style;
     },
   },
 };
@@ -27,20 +81,23 @@ export default {
   <div :class="$style.navigation">
     <p :class="$style.title">Navigation</p>
     <div :class="$style.numberBox">
-      <!-- idx start from 1 -->
+      <!-- :class="[
+          $style.number,
+          currentNumber - 1 === idx ? $style.current : '',
+        ]" -->
       <div
-        v-for="idx in totalNumber"
-        :class="[$style.number, currentNumber === idx ? $style.current : '']"
+        v-for="(item, idx) in userData.status"
+        :class="numberClass(item, idx + 1)"
         :key="idx"
-        @click="$emit('change-number', idx)"
+        @click="$emit('change-number', idx + 1)"
       >
-        {{ idx }}
+        {{ idx + 1 }}
       </div>
     </div>
     <p :class="$style.score">
       Score: <span :class="$style.value">{{ score }}</span>
     </p>
-    <p :class="$style.tries">Tries remaining: {{ tries }}</p>
+    <p :class="triesClass">{{ tries }}</p>
   </div>
 </template>
 
@@ -64,43 +121,6 @@ export default {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
-
-  .number {
-    cursor: pointer;
-    border-radius: 50%;
-    min-width: 54px;
-    min-height: 54px;
-    max-width: 54px;
-    max-height: 54px;
-    color: black;
-    background: white;
-    border: 2px solid $primary;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s ease;
-    font-size: 1.25rem;
-    font-weight: bold;
-    justify-self: center;
-    transition: all 0.3s ease;
-
-    &:hover {
-      background-color: $primary;
-      color: white;
-    }
-    &:active {
-      transform: scale(0.9);
-    }
-
-    &.current {
-      background: $primary;
-      color: white;
-
-      &:hover {
-        background-color: lighten($primary, 10);
-      }
-    }
-  }
 }
 
 .score {
@@ -115,5 +135,84 @@ export default {
 
 .tries {
   margin-top: 0.5rem;
+}
+
+.number {
+  cursor: pointer;
+  border-radius: 50%;
+  min-width: 54px;
+  min-height: 54px;
+  max-width: 54px;
+  max-height: 54px;
+  color: black;
+  background: white;
+  border: 2px solid $primary;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  font-size: 1.25rem;
+  font-weight: bold;
+  justify-self: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: $primary;
+    color: white;
+  }
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.successColor {
+  color: $success;
+  font-weight: bold;
+}
+.wrongColor {
+  color: $danger;
+  font-weight: bold;
+}
+.partialColor {
+  color: $partial;
+  font-weight: bold;
+}
+
+.current {
+  background: $primary;
+  color: white;
+
+  &:hover {
+    background-color: lighten($primary, 10);
+  }
+}
+
+.successBg {
+  background: $success;
+  font-weight: bold;
+  color: white;
+  border: 2px solid darken($success, 10);
+
+  &:hover {
+    background-color: lighten($success, 10);
+  }
+}
+.wrongBg {
+  background: $danger;
+  font-weight: bold;
+  color: white;
+  border: 2px solid darken($danger, 10);
+  &:hover {
+    background-color: lighten($danger, 10);
+  }
+}
+.partialBg {
+  background: $partial;
+  font-weight: bold;
+  color: white;
+  border: 2px solid darken($partial, 10);
+  &:hover {
+    background-color: lighten($partial, 10);
+  }
 }
 </style>

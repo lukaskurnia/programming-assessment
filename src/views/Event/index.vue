@@ -63,7 +63,8 @@ export default {
     },
     addOnScrollEvent() {
       const $header = document.getElementById("header");
-      $header.style.zIndex = window.pageYOffset > 10 ? 2 : 0;
+      // console.log(window.pageYOffset); //400 show timer
+      $header.style.zIndex = window.pageYOffset > 10 ? 5 : 0;
       $header.style.boxShadow =
         window.pageYOffset > 10 ? "0 2px 8px rgba(0,0,0,0.12)" : "none";
     },
@@ -118,6 +119,7 @@ export default {
           :current-number="currentNumber"
           :duration="event.duration"
           :exam="currentExam"
+          :test-cases="event.test_case"
           @update-exam="updateUserExams"
           @update-ls="updateLS"
           @change-number="changeNumber"
