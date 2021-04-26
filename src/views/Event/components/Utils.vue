@@ -20,32 +20,37 @@ export default {
   },
   data() {
     return {
+      // Time variable
+      autosaves: 5000,
       times: {
         hours: 0,
         minutes: 0,
         seconds: 0,
       },
-      remainingTimeInterval: null, // Interval
+
+      // Interval variable
+      remainingTimeInterval: null,
+      saveStorageInterval: null,
+
       isTimesUp: false,
       currentTab: 0,
-      userAnswer: null,
+      userAnswer: [],
     };
   },
   created() {
+    this.fetchAnswer();
     this.triggerTime();
-    this.userAnswer = this.currentQuestion.answers;
+    this.saveStorageInterval = setInterval(async () => {
+      this.updateAnswer();
+    }, this.autosaves);
   },
   beforeUnmount() {
+    clearInterval(this.saveStorageInterval);
     clearInterval(this.remainingTimeInterval);
   },
   watch: {
     currentNumber() {
-      this.userAnswer = this.currentQuestion.answers;
-    },
-  },
-  computed: {
-    currentQuestion() {
-      return this.exam.questions[this.currentNumber - 1];
+      this.currentTab = 0;
     },
   },
   methods: {
@@ -54,9 +59,41 @@ export default {
     },
     changeTab(val) {
       this.currentTab = val;
+      console.log(this.user);
     },
     typeAnswer(val) {
-      this.userAnswer[this.currentTab] = val;
+      this.userAnswer[this.currentNumber - 1][this.currentTab] = val;
+    },
+    handleUpload(evt) {
+      const file = evt.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = e =>
+        (this.userAnswer[this.currentNumber - 1][this.currentTab] =
+          e.target.result);
+      reader.readAsText(file);
+    },
+    fetchAnswer() {
+      this.exam.questions.map(el => {
+        this.userAnswer.push(el.answers);
+      });
+    },
+    updateAnswer() {
+      let data = [];
+      for (let i = 0; i < this.exam.questions.length; i++) {
+        let obj = {
+          score: this.exam.questions[i].score,
+          tries: this.exam.questions[i].tries,
+          answers: this.userAnswer[i],
+        };
+        data.push(obj);
+      }
+      this.$emit("update-exam", "questions", data);
+      this.$emit("update-ls");
+    },
+    submit() {
+      //include grading
+      this.updateAnswer();
     },
     async triggerTime() {
       let startTime;
@@ -97,7 +134,7 @@ export default {
     <div :class="$style.upperSection">
       <div :class="$style.navSection">
         <Navigation
-          :currentQuestion="currentQuestion"
+          :currentQuestion="exam.questions[currentNumber - 1]"
           :totalNumber="exam.questions.length"
           :current-number="currentNumber"
           @change-number="changeNumber"
@@ -125,7 +162,7 @@ export default {
       <div>
         <div :class="$style.codeHeader">
           <div
-            v-for="num in currentQuestion.answers.length"
+            v-for="num in userAnswer[currentNumber - 1].length"
             :key="num - 1"
             :class="[$style.tab, num - 1 === currentTab ? $style.active : '']"
             @click="changeTab(num - 1)"
@@ -133,7 +170,34 @@ export default {
             {{ num - 1 === 0 ? "solution.c" : "solution.h" }}
           </div>
         </div>
-        <CodeEditor :code="userAnswer[currentTab]" @type-answer="typeAnswer" />
+        <CodeEditor
+          :code="userAnswer[currentNumber - 1][currentTab]"
+          @type-answer="typeAnswer"
+        />
+        <div :class="$style.bottomGroup">
+          <div :class="$style.input">
+            <!-- TODO: Change to modal action -->
+            <input type="file" id="upload" hidden @change="handleUpload" />
+            <label for="upload"
+              ><font-awesome-icon icon="upload" :class="$style.icon" />Upload
+              code</label
+            >
+          </div>
+          <div>
+            <div :class="$style.bottomBtn">
+              <button class="btn btn-primary--alt" :class="$style.runBtn">
+                Run
+              </button>
+              <button
+                class="btn btn-primary"
+                :class="$style.submitBtn"
+                @click="submit"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -165,29 +229,26 @@ export default {
 
 .codeHeader {
   display: flex;
+  margin-bottom: -2px;
 
   .tab {
     width: 100%;
-    max-width: 100px;
+    max-width: 120px;
     position: relative;
     border-radius: 16px 16px 0 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    filter: drop-shadow(0px -4px 4px rgba(0, 0, 0, 0.12));
     padding: 1rem;
-    // background: #f7f7f7;
     background: $primary;
     color: white;
     transition: 0.3s all ease;
     cursor: pointer;
 
     &:not(:first-child) {
-      margin-left: -5px;
+      margin-left: -10px;
     }
 
     &:hover {
       background-color: lighten($primary, 10);
-      // background-color: white;
-      // color: $primary;
-      // color: #f7f7f7;
     }
 
     // white-space: nowrap;
@@ -199,7 +260,9 @@ export default {
       font-weight: bold;
       color: $secondary;
       background: white;
-      box-shadow: 0 2px 8px rgba($primary, 0.12);
+      box-shadow: none;
+      filter: drop-shadow(0px -4px 4px rgba(0, 0, 0, 0.12));
+      // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 
       &:hover {
         background-color: lighten(white, 10);
@@ -219,6 +282,49 @@ export default {
   }
   .finishBtn {
     width: 100%;
+  }
+}
+
+.bottomBtn {
+  display: flex;
+  width: 300px;
+  button {
+    max-width: 203px;
+    width: 100%;
+    &:not(:first-child) {
+      margin-left: 1rem;
+    }
+  }
+  // .submitBtn {
+  // max-width: 203px;
+  // width: 100%;
+  // }
+
+  // .runBtn {
+  //   max-width: 203px;
+  //   width: 100%;
+  // }
+}
+
+.bottomGroup {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .input {
+    .icon {
+      margin-right: 1rem;
+      font-size: 1.5rem;
+    }
+    label {
+      cursor: pointer;
+      transition: 0.3s all ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
   }
 }
 </style>
