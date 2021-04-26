@@ -1,22 +1,33 @@
 <script>
 import { millisecondToTime } from "@/utils/datetime";
+import Feedback from "./Feedback";
 import Navigation from "./Navigation";
 import Timer from "./Timer";
 import CodeEditor from "./CodeEditor";
+import Grader from "./Grader";
 export default {
   name: "Utils",
   components: {
     Navigation,
     Timer,
     CodeEditor,
+    Feedback,
+    Grader,
   },
   props: {
     currentNumber: {
       type: Number,
       default: 1,
     },
+    testCases: Array,
     duration: Number,
     exam: Object,
+    // exam contain: {
+    //   score: Number,
+    //   tries: Number,
+    //   answers: Array of string ['',''] etc,
+    //   status: string of run-error, run-success, submit-success, submit-partial, submit-wrong
+    // }
   },
   data() {
     return {
@@ -34,11 +45,16 @@ export default {
 
       isTimesUp: false,
       currentTab: 0,
-      userAnswer: [],
+      userData: {
+        answer: [],
+        status: [],
+        score: [],
+        tries: [],
+      },
     };
   },
   created() {
-    this.fetchAnswer();
+    this.fetchUserData();
     this.triggerTime();
     this.saveStorageInterval = setInterval(async () => {
       this.updateAnswer();
@@ -59,41 +75,74 @@ export default {
     },
     changeTab(val) {
       this.currentTab = val;
-      console.log(this.user);
     },
     typeAnswer(val) {
-      this.userAnswer[this.currentNumber - 1][this.currentTab] = val;
+      this.userData.answer[this.currentNumber - 1][this.currentTab] = val;
     },
     handleUpload(evt) {
       const file = evt.target.files[0];
       const reader = new FileReader();
 
       reader.onload = e =>
-        (this.userAnswer[this.currentNumber - 1][this.currentTab] =
+        (this.userData.answer[this.currentNumber - 1][this.currentTab] =
           e.target.result);
       reader.readAsText(file);
     },
-    fetchAnswer() {
+    fetchUserData() {
       this.exam.questions.map(el => {
-        this.userAnswer.push(el.answers);
+        this.userData.answer.push(el.answers);
+        this.userData.status.push(el.status);
+        this.userData.score.push(el.score);
+        this.userData.tries.push(el.tries);
       });
     },
     updateAnswer() {
       let data = [];
       for (let i = 0; i < this.exam.questions.length; i++) {
         let obj = {
-          score: this.exam.questions[i].score,
-          tries: this.exam.questions[i].tries,
-          answers: this.userAnswer[i],
+          score: this.userData.score[i],
+          tries: this.userData.tries[i],
+          answers: this.userData.answer[i],
+          status: this.userData.status[i],
         };
         data.push(obj);
       }
       this.$emit("update-exam", "questions", data);
       this.$emit("update-ls");
     },
-    submit() {
-      //include grading
+    run() {
+      // if there are user answer compile success, else compile error
+      this.userData.status[this.currentNumber - 1] = this.userData.answer[
+        this.currentNumber - 1
+      ][0]
+        ? "run-success"
+        : "run-error";
       this.updateAnswer();
+    },
+    submit() {
+      if (this.userData.tries[this.currentNumber - 1] > 0) {
+        const tc = this.testCases[this.currentNumber - 1];
+        let sum = 0;
+        let countZero = 0;
+        for (let i = 0; i < tc.length; i++) {
+          if (!tc[i]) countZero++;
+          sum += tc[i];
+        }
+        this.userData.status[this.currentNumber - 1] =
+          countZero === 0
+            ? "submit-success"
+            : countZero === tc.length
+            ? "submit-wrong"
+            : "submit-partial";
+        this.userData.score[this.currentNumber - 1] = sum;
+        if (
+          this.userData.status[this.currentNumber - 1] === "submit-wrong" ||
+          this.userData.status[this.currentNumber - 1] === "submit-partial"
+        ) {
+          this.userData.tries[this.currentNumber - 1]--;
+        }
+        this.updateAnswer();
+      }
     },
     async triggerTime() {
       let startTime;
@@ -134,8 +183,7 @@ export default {
     <div :class="$style.upperSection">
       <div :class="$style.navSection">
         <Navigation
-          :currentQuestion="exam.questions[currentNumber - 1]"
-          :totalNumber="exam.questions.length"
+          :user-data="userData"
           :current-number="currentNumber"
           @change-number="changeNumber"
         />
@@ -162,7 +210,7 @@ export default {
       <div>
         <div :class="$style.codeHeader">
           <div
-            v-for="num in userAnswer[currentNumber - 1].length"
+            v-for="num in userData.answer[currentNumber - 1].length"
             :key="num - 1"
             :class="[$style.tab, num - 1 === currentTab ? $style.active : '']"
             @click="changeTab(num - 1)"
@@ -171,7 +219,7 @@ export default {
           </div>
         </div>
         <CodeEditor
-          :code="userAnswer[currentNumber - 1][currentTab]"
+          :code="userData.answer[currentNumber - 1][currentTab]"
           @type-answer="typeAnswer"
         />
         <div :class="$style.bottomGroup">
@@ -185,10 +233,18 @@ export default {
           </div>
           <div>
             <div :class="$style.bottomBtn">
-              <button class="btn btn-primary--alt" :class="$style.runBtn">
+              <button
+                @click="run"
+                class="btn btn-primary--alt"
+                :class="$style.runBtn"
+              >
                 Run
               </button>
               <button
+                v-if="
+                  userData.status[currentNumber - 1] &&
+                  userData.status[currentNumber - 1] !== 'run-error'
+                "
                 class="btn btn-primary"
                 :class="$style.submitBtn"
                 @click="submit"
@@ -198,6 +254,23 @@ export default {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div
+      :class="$style.bottomSection"
+      v-if="userData.status[currentNumber - 1]"
+    >
+      <div>
+        <Feedback :status="userData.status[currentNumber - 1]" />
+      </div>
+      <div
+        :class="$style.graderSection"
+        v-if="
+          userData.status[currentNumber - 1] !== 'run-success' &&
+          userData.status[currentNumber - 1] !== 'run-error'
+        "
+      >
+        <Grader :test-case="testCases[currentNumber - 1]" />
       </div>
     </div>
   </div>
@@ -223,8 +296,16 @@ export default {
   margin-top: 2rem;
 }
 
+.bottomSection {
+  margin-top: 2rem;
+}
+
 .timerSection {
   justify-self: center;
+}
+
+.graderSection {
+  margin-top: 1.5rem;
 }
 
 .codeHeader {
@@ -287,10 +368,12 @@ export default {
 
 .bottomBtn {
   display: flex;
-  width: 300px;
+  // width: 300px;
+
   button {
-    max-width: 203px;
-    width: 100%;
+    flex: 1;
+    min-width: 203px;
+    // width: 100%;
     &:not(:first-child) {
       margin-left: 1rem;
     }
@@ -300,10 +383,9 @@ export default {
   // width: 100%;
   // }
 
-  // .runBtn {
-  //   max-width: 203px;
-  //   width: 100%;
-  // }
+  .runBtn {
+    border: 1px solid $primary;
+  }
 }
 
 .bottomGroup {
