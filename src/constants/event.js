@@ -2,6 +2,7 @@ export const EVENT_DATA = [
   {
     id_event: 1,
     name: "Assignment 1",
+    duration: 310000,
     questions: [
       {
         title: "Sample Question 1",
@@ -68,6 +69,7 @@ export const EVENT_DATA = [
   {
     id_event: 2,
     name: "Assignment 2",
+    duration: 3600000,
     questions: [
       {
         title: "Sample Question 1",
@@ -134,6 +136,7 @@ export const EVENT_DATA = [
   {
     id_event: 3,
     name: "Assignment 3",
+    duration: 310000,
     questions: [
       {
         title: "Sample Question 1",
@@ -200,6 +203,7 @@ export const EVENT_DATA = [
   {
     id_event: 4,
     name: "Assignment 4",
+    duration: 310000,
     questions: [
       {
         title: "Sample Question 1",
@@ -266,6 +270,7 @@ export const EVENT_DATA = [
   {
     id_event: 5,
     name: "Assignment 5",
+    duration: 310000,
     questions: [
       {
         title: "Sample Question 1",

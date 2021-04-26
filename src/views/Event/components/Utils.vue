@@ -14,6 +14,7 @@ export default {
       default: 1,
     },
     questions: Array,
+    duration: Number,
     exam: Object,
   },
   data() {
@@ -23,7 +24,6 @@ export default {
         minutes: 0,
         seconds: 0,
       },
-      duration: 310000, // 5 minute 10 second
       remainingTimeInterval: null, // Interval
       isTimesUp: false,
     };
@@ -86,6 +86,18 @@ export default {
         <div>
           <Timer :time="times" />
         </div>
+        <div :class="$style.btnGroup">
+          <div>
+            <button class="btn btn-primary" :class="$style.summaryBtn">
+              Summary
+            </button>
+          </div>
+          <div>
+            <button class="btn btn-primary" :class="$style.finishBtn">
+              Finish Assignment
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -109,5 +121,22 @@ export default {
 
 .timerSection {
   justify-self: center;
+}
+
+.btnGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0 1rem;
+  column-gap: 1rem;
+
+  .summaryBtn {
+    width: 100%;
+    // justify-self: stretch;
+    // flex: 1.5;
+  }
+  .finishBtn {
+    width: 100%;
+    // flex: 1;
+  }
 }
 </style>
