@@ -35,7 +35,6 @@ export default {
 
 <style lang="scss" module>
 .grader {
-  background: white;
   .header {
     padding: 1rem;
     text-align: center;

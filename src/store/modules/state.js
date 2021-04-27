@@ -1,24 +1,30 @@
 // initial state
 const state = {
-  remainingTime: 60000,
+  tutorialStep: -1,
 };
 
 // getters
 const getters = {
-  getRemainingTime: state => state.remainingTime,
+  getTutorialStep: state => state.tutorialStep,
 };
 
 // mutations
 const mutations = {
-  setRemainingTime(state, payload) {
-    state.remainingTime = payload.val;
+  setTutorialStep(state, payload) {
+    state.tutorialStep = payload.val;
   },
 };
 
 // Actions
 const actions = {
-  setRemainingTime({ commit }, val) {
-    commit("setTimeoutStatus", {
+  setTutorialStep({ commit }, val) {
+    commit("setTutorialStep", {
+      val,
+    });
+  },
+  incrementTutorialStep({ getters, commit }) {
+    const val = getters.getTutorialStep + 1;
+    commit("setTutorialStep", {
       val,
     });
   },

@@ -1,7 +1,6 @@
 <script>
-import { mapGetters, mapActions } from "vuex";
+// import { mapGetters, mapActions } from "vuex";
 import { millisecondToTime } from "@/utils/datetime";
-import SpeechBubble from "@/components/SpeechBubble";
 import Loading from "@/components/Loading";
 import Feedback from "./Feedback";
 import Navigation from "./Navigation";
@@ -23,7 +22,6 @@ export default {
     ModalSummary,
     ModalFinish,
     ModalUpload,
-    SpeechBubble,
   },
   props: {
     currentNumber: {
@@ -89,64 +87,20 @@ export default {
     clearInterval(this.saveStorageInterval);
     clearInterval(this.remainingTimeInterval);
   },
-  computed: {
-    ...mapGetters({
-      tutorialStep: "State/getTutorialStep",
-    }),
-    tutorialText() {
-      if (this.tutorialStep === 2) {
-        return "Navigate through questions with this navigation. You can also get information about the current question score and remaining tries.";
-      } else if (this.tutorialStep === 3) {
-        return "Don’t forget to check your remaining time!";
-      } else if (this.tutorialStep === 4) {
-        return "Write or upload your code here!";
-      } else if (this.tutorialStep === 5) {
-        return "Run to compile your code! Don’t worry, your remaining tries will not reduce unless you submitted your code :D";
-      } else if (this.tutorialStep === 6) {
-        return "After compile, don’t forget submit to grade your code!";
-      } else if (this.tutorialStep === 7) {
-        return "Review your work with summary! After you’ve done, finish your assignment :)";
-      }
-      return "";
-    },
-  },
+  // computed: {
+  //   // ...mapGetters({
+  //   //   examRemainingTime: "State/getRemainingTime",
+  //   // }),
+  // },
   watch: {
-    tutorialStep(val) {
-      if (val === 2) {
-        this.scrollTo("step-2");
-      } else if (val === 4) {
-        this.scrollTo("step-4");
-      } else if (val === 5) {
-        this.scrollTo("step-5");
-      } else if (val === 6) {
-        // For tutorial purpose only
-        this.userData.status[this.currentNumber - 1] = "run-success";
-        setTimeout(() => {
-          console.log("a");
-          this.scrollTo("step-6");
-        }, 1000);
-      } else if (val === 7) {
-        // For tutorial purpose only
-        this.userData.status[this.currentNumber - 1] = "";
-        this.scrollTo("step-7");
-      }
-    },
     currentNumber() {
       this.currentTab = 0;
     },
   },
   methods: {
-    ...mapActions({
-      nextTutorial: "State/incrementTutorialStep",
-      setStep: "State/setTutorialStep",
-    }),
-    scrollTo(id) {
-      document.getElementById(id).scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-        inline: "nearest",
-      });
-    },
+    // ...mapActions({
+    //   setExamRemainingTime: "State/setRemainingTime",
+    // }),
     openModal(val) {
       this.modal.active = true;
       this.modal.name = val;
@@ -190,14 +144,10 @@ export default {
         data.push(obj);
       }
       this.$emit("update-exam", "questions", data);
-      if (this.tutorialStep === -1) {
-        // Only update to database when not in tutorial
-        this.$emit("update-ls");
-      }
+      this.$emit("update-ls");
     },
     disableElement() {
       return (
-        this.tutorialStep !== -1 ||
         this.userData.tries[this.currentNumber - 1] === 0 ||
         this.userData.status[this.currentNumber - 1] === "submit-success"
       );
@@ -258,10 +208,7 @@ export default {
       const grade = Math.floor(sum / this.userData.score.length);
       this.$emit("update-exam", "finished_at", currentDate.getTime());
       this.$emit("update-exam", "grade", grade);
-      if (this.tutorialStep === -1) {
-        // Only update to database when not in tutorial
-        this.$emit("update-ls");
-      }
+      this.$emit("update-ls");
       this.$router.push({ name: "Home" });
     },
     async triggerTime() {
@@ -273,10 +220,7 @@ export default {
       } else {
         startTime = currentTime;
         this.$emit("update-exam", "started_at", currentTime);
-        if (this.tutorialStep === -1) {
-          // Only update to database when not in tutorial
-          this.$emit("update-ls");
-        }
+        this.$emit("update-ls");
       }
 
       const lastTime = startTime + this.duration;
@@ -289,10 +233,7 @@ export default {
         if (examRemainingTime <= 0) {
           if (this.isTimesUp === false) {
             this.isTimesUp = true;
-            if (this.tutorialStep === -1) {
-              // Only clickable when not in tutorial
-              this.openModal("finish");
-            }
+            this.openModal("finish");
           }
         }
       }, 1000);
@@ -328,23 +269,8 @@ export default {
       <Timer :time="times" :is-float="true" />
     </div>
     <div :class="$style.upperSection">
-      <div
-        :class="[
-          $style.tutorialWrapper,
-          tutorialStep === 2 ? $style.highlighted : '',
-        ]"
-      >
-        <SpeechBubble
-          v-if="tutorialStep === 2"
-          :text="tutorialText"
-          :is-top="false"
-          :is-left="true"
-          :arrow-left="false"
-          :middle="true"
-          @next-step="nextTutorial"
-        />
+      <div :class="$style.navSection">
         <Navigation
-          id="step-2"
           :max-score="maxScores"
           :user-data="userData"
           :current-number="currentNumber"
@@ -352,76 +278,32 @@ export default {
         />
       </div>
       <div :class="$style.timerSection">
-        <div
-          :class="[
-            $style.tutorialWrapper,
-            tutorialStep === 3 ? $style.highlighted : '',
-          ]"
-        >
-          <SpeechBubble
-            v-if="tutorialStep === 3"
-            :text="tutorialText"
-            :is-top="false"
-            :is-left="true"
-            :arrow-left="false"
-            :middle="true"
-            @next-step="nextTutorial"
-          />
-          <Timer id="step-3" :time="times" />
+        <div>
+          <Timer :time="times" />
         </div>
-        <div
-          :class="[
-            $style.tutorialWrapper,
-            tutorialStep === 7 ? $style.highlighted : '',
-          ]"
-        >
-          <SpeechBubble
-            v-if="tutorialStep === 7"
-            :text="tutorialText"
-            :is-top="false"
-            :is-left="true"
-            :arrow-left="false"
-            :wider="true"
-            @next-step="nextTutorial"
-          />
-          <div :class="$style.btnGroup" id="step-7">
-            <div>
-              <button
-                @click="this.tutorialStep === -1 && openModal('summary')"
-                class="btn btn-primary"
-                :class="$style.summaryBtn"
-              >
-                Summary
-              </button>
-            </div>
-            <div>
-              <button
-                @click="this.tutorialStep === -1 && openModal('finish')"
-                class="btn btn-primary"
-                :class="$style.finishBtn"
-              >
-                Finish Assignment
-              </button>
-            </div>
+        <div :class="$style.btnGroup">
+          <div>
+            <button
+              @click="openModal('summary')"
+              class="btn btn-primary"
+              :class="$style.summaryBtn"
+            >
+              Summary
+            </button>
+          </div>
+          <div>
+            <button
+              @click="openModal('finish')"
+              class="btn btn-primary"
+              :class="$style.finishBtn"
+            >
+              Finish Assignment
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div
-      :class="[
-        $style.middleSection,
-        $style.tutorialWrapper,
-        tutorialStep === 4 ? $style.highlighted : '',
-      ]"
-    >
-      <SpeechBubble
-        v-if="tutorialStep === 4"
-        :text="tutorialText"
-        :is-top="true"
-        :is-left="true"
-        :arrow-left="false"
-        @next-step="nextTutorial"
-      />
+    <div :class="$style.middleSection">
       <div>
         <div :class="$style.codeHeader">
           <div
@@ -440,7 +322,6 @@ export default {
         />
         <div :class="$style.bottomGroup">
           <div
-            id="step-4"
             :class="[$style.input, disableElement() ? $style.disabled : '']"
             @click="disableElement() || openModal('upload')"
           >
@@ -448,31 +329,14 @@ export default {
           </div>
           <div>
             <div :class="$style.bottomBtn">
-              <div
-                :class="[
-                  $style.tutorialWrapper,
-                  tutorialStep === 5 ? $style.highlighted : '',
-                ]"
+              <button
+                @click="run"
+                class="btn btn-primary--alt"
+                :class="$style.runBtn"
+                :disabled="disableElement()"
               >
-                <SpeechBubble
-                  v-if="tutorialStep === 5"
-                  :text="tutorialText"
-                  :is-top="true"
-                  :is-left="true"
-                  :arrow-left="false"
-                  :wider="true"
-                  @next-step="nextTutorial"
-                />
-                <button
-                  id="step-5"
-                  @click="run"
-                  class="btn btn-primary--alt"
-                  :class="$style.runBtn"
-                  :disabled="disableElement()"
-                >
-                  Run
-                </button>
-              </div>
+                Run
+              </button>
               <button
                 v-if="
                   userData.status[currentNumber - 1] &&
@@ -480,10 +344,7 @@ export default {
                 "
                 :disabled="disableElement()"
                 class="btn btn-primary"
-                :class="[
-                  $style.submitBtn,
-                  tutorialStep === 6 ? $style.highlighted : '',
-                ]"
+                :class="$style.submitBtn"
                 @click="submit"
               >
                 Submit
@@ -500,29 +361,11 @@ export default {
       :class="$style.bottomSection"
       v-if="userData.status[currentNumber - 1] && !loading"
     >
-      <div
-        :class="[
-          $style.tutorialWrapper,
-          tutorialStep === 6 ? $style.highlighted : '',
-        ]"
-      >
-        <SpeechBubble
-          v-if="tutorialStep === 6"
-          :text="tutorialText"
-          :is-top="true"
-          :is-left="true"
-          :arrow-left="false"
-          :middle="true"
-          @next-step="nextTutorial"
-        />
-        <Feedback id="step-6" :status="userData.status[currentNumber - 1]" />
+      <div>
+        <Feedback :status="userData.status[currentNumber - 1]" />
       </div>
       <div
-        :class="[
-          $style.graderSection,
-          $style.tutorialWrapper,
-          tutorialStep === 6 ? $style.highlighted : '',
-        ]"
+        :class="$style.graderSection"
         v-if="
           userData.status[currentNumber - 1] !== 'run-success' &&
           userData.status[currentNumber - 1] !== 'run-error'
@@ -659,8 +502,6 @@ export default {
   align-items: center;
 
   .input {
-    background: white;
-    padding: 0.5rem;
     cursor: pointer;
     .icon {
       margin-right: 1rem;
@@ -675,14 +516,6 @@ export default {
       cursor: not-allowed;
     }
   }
-}
-
-.highlighted {
-  z-index: 10;
-}
-.tutorialWrapper {
-  position: relative;
-  width: 100%;
 }
 
 @keyframes showUp {
