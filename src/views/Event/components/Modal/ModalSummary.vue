@@ -144,6 +144,7 @@ export default {
   animation-timing-function: ease;
 
   background: white;
+  max-width: 900px;
   width: 60%;
   padding: 3rem 5rem 5rem;
 

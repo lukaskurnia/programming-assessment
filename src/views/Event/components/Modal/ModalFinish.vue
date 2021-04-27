@@ -58,6 +58,7 @@ export default {
   animation-timing-function: ease;
 
   background: white;
+  max-width: 900px;
   width: 60%;
   padding: 5rem;
   border-radius: 1rem;

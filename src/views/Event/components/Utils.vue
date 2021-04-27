@@ -9,6 +9,7 @@ import CodeEditor from "./CodeEditor";
 import Grader from "./Grader";
 import ModalSummary from "./Modal/ModalSummary";
 import ModalFinish from "./Modal/ModalFinish";
+import ModalUpload from "./Modal/ModalUpload";
 export default {
   name: "Utils",
   components: {
@@ -20,6 +21,7 @@ export default {
     Loading,
     ModalSummary,
     ModalFinish,
+    ModalUpload,
   },
   props: {
     currentNumber: {
@@ -116,14 +118,11 @@ export default {
     typeAnswer(val) {
       this.userData.answer[this.currentNumber - 1][this.currentTab] = val;
     },
-    handleUpload(evt) {
-      const file = evt.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = e =>
-        (this.userData.answer[this.currentNumber - 1][this.currentTab] =
-          e.target.result);
-      reader.readAsText(file);
+    handleUpload(val) {
+      this.userData.answer[this.currentNumber - 1][this.currentTab] = val;
+    },
+    resetFile() {
+      this.tempFile = "";
     },
     fetchUserData() {
       this.exam.questions.map(el => {
@@ -155,10 +154,10 @@ export default {
     },
     run() {
       this.loading = true;
-      (this.loadingType = "run"),
-        setTimeout(() => {
-          this.loading = false;
-        }, this.delay);
+      this.loadingType = "run";
+      setTimeout(() => {
+        this.loading = false;
+      }, this.delay);
 
       // if there are user answer compile success, else compile error
       this.userData.status[this.currentNumber - 1] = this.userData.answer[
@@ -171,10 +170,10 @@ export default {
     submit() {
       if (this.userData.tries[this.currentNumber - 1] > 0) {
         this.loading = true;
-        (this.loadingType = "submit"),
-          setTimeout(() => {
-            this.loading = false;
-          }, this.delay);
+        this.loadingType = "submit";
+        setTimeout(() => {
+          this.loading = false;
+        }, this.delay);
 
         const tc = this.testCases[this.currentNumber - 1];
         let sum = 0;
@@ -260,6 +259,11 @@ export default {
       @finish="finish"
       @close="closeModal"
     />
+    <ModalUpload
+      v-show="modal.active && modal.name === 'upload'"
+      @upload="handleUpload"
+      @close="closeModal"
+    />
 
     <div :class="$style.floatingTimer" v-show="floatingTimer">
       <Timer :time="times" :is-float="true" />
@@ -317,19 +321,11 @@ export default {
           @type-answer="typeAnswer"
         />
         <div :class="$style.bottomGroup">
-          <div :class="$style.input">
-            <!-- TODO: Change to modal action -->
-            <input
-              :disabled="disableElement()"
-              type="file"
-              id="upload"
-              hidden
-              @change="handleUpload"
-            />
-            <label :class="disableElement() ? $style.disabled : ''" for="upload"
-              ><font-awesome-icon icon="upload" :class="$style.icon" />Upload
-              code</label
-            >
+          <div
+            :class="[$style.input, disableElement() ? $style.disabled : '']"
+            @click="disableElement() || openModal('upload')"
+          >
+            <font-awesome-icon icon="upload" :class="$style.icon" />Upload code
           </div>
           <div>
             <div :class="$style.bottomBtn">
@@ -506,21 +502,18 @@ export default {
   align-items: center;
 
   .input {
+    cursor: pointer;
     .icon {
       margin-right: 1rem;
       font-size: 1.5rem;
     }
-    label {
-      cursor: pointer;
-      transition: 0.3s all ease;
 
-      &:hover {
-        opacity: 0.8;
-      }
+    &:hover {
+      opacity: 0.8;
+    }
 
-      &.disabled {
-        cursor: not-allowed;
-      }
+    &.disabled {
+      cursor: not-allowed;
     }
   }
 }
