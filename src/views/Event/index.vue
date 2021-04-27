@@ -122,6 +122,7 @@ export default {
           :current-number="currentNumber"
           :duration="event.duration"
           :exam="currentExam"
+          :max-scores="event.max_score"
           :test-cases="event.test_case"
           :floating-timer="floatingTimer"
           @update-exam="updateUserExams"

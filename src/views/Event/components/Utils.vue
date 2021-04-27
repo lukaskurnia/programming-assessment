@@ -7,6 +7,7 @@ import Navigation from "./Navigation";
 import Timer from "./Timer";
 import CodeEditor from "./CodeEditor";
 import Grader from "./Grader";
+import ModalSummary from "./Modal/ModalSummary";
 export default {
   name: "Utils",
   components: {
@@ -16,6 +17,7 @@ export default {
     Feedback,
     Grader,
     Loading,
+    ModalSummary,
   },
   props: {
     currentNumber: {
@@ -23,6 +25,7 @@ export default {
       default: 1,
     },
     testCases: Array,
+    maxScores: Array,
     duration: Number,
     floatingTimer: {
       type: Boolean,
@@ -59,6 +62,11 @@ export default {
         tries: [],
       },
 
+      modal: {
+        name: "",
+        active: false,
+      },
+
       loading: false,
       loadingType: "run",
       delay: 1000,
@@ -76,9 +84,9 @@ export default {
     clearInterval(this.remainingTimeInterval);
   },
   // computed: {
-  //   ...mapGetters({
-  //     examRemainingTime: "State/getRemainingTime",
-  //   }),
+  //   // ...mapGetters({
+  //   //   examRemainingTime: "State/getRemainingTime",
+  //   // }),
   // },
   watch: {
     currentNumber() {
@@ -89,6 +97,14 @@ export default {
     // ...mapActions({
     //   setExamRemainingTime: "State/setRemainingTime",
     // }),
+    openModal(val) {
+      this.modal.active = true;
+      this.modal.name = val;
+    },
+    closeModal() {
+      this.modal.active = false;
+      this.modal.name = "";
+    },
     changeNumber(val) {
       this.$emit("change-number", val);
     },
@@ -217,12 +233,23 @@ export default {
 
 <template>
   <div :class="$style.utils">
+    <ModalSummary
+      v-show="modal.active && modal.name === 'summary'"
+      :max-score="maxScores"
+      :user-data="userData"
+      :current-number="currentNumber"
+      :time="times"
+      @change-number="changeNumber"
+      @close="closeModal"
+    />
+
     <div :class="$style.floatingTimer" v-show="floatingTimer">
       <Timer :time="times" :is-float="true" />
     </div>
     <div :class="$style.upperSection">
       <div :class="$style.navSection">
         <Navigation
+          :max-score="maxScores"
           :user-data="userData"
           :current-number="currentNumber"
           @change-number="changeNumber"
@@ -234,7 +261,11 @@ export default {
         </div>
         <div :class="$style.btnGroup">
           <div>
-            <button class="btn btn-primary" :class="$style.summaryBtn">
+            <button
+              @click="openModal('summary')"
+              class="btn btn-primary"
+              :class="$style.summaryBtn"
+            >
               Summary
             </button>
           </div>

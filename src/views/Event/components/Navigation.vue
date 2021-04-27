@@ -10,11 +10,20 @@ export default {
       type: Number,
       default: 5,
     },
-    // currentQuestion: Object,
+    maxScore: Array,
     userData: Object,
   },
   computed: {
-    score() {
+    displayedScore() {
+      if (
+        this.userData.status[this.currentNumber - 1] &&
+        this.userData.status[this.currentNumber - 1] !== "run-error" &&
+        this.userData.status[this.currentNumber - 1] !== "run-success"
+      ) {
+        return `${this.userData.score[this.currentNumber - 1]}/${
+          this.maxScore[this.currentNumber - 1]
+        }`;
+      }
       return this.userData.score[this.currentNumber - 1];
     },
     tries() {
@@ -81,10 +90,6 @@ export default {
   <div :class="$style.navigation">
     <p :class="$style.title">Navigation</p>
     <div :class="$style.numberBox">
-      <!-- :class="[
-          $style.number,
-          currentNumber - 1 === idx ? $style.current : '',
-        ]" -->
       <div
         v-for="(item, idx) in userData.status"
         :class="numberClass(item, idx + 1)"
@@ -95,7 +100,7 @@ export default {
       </div>
     </div>
     <p :class="$style.score">
-      Score: <span :class="$style.value">{{ score }}</span>
+      Score: <span :class="$style.value">{{ displayedScore }}</span>
     </p>
     <p :class="triesClass">{{ tries }}</p>
   </div>
