@@ -7,6 +7,9 @@ import Navigation from "./Navigation";
 import Timer from "./Timer";
 import CodeEditor from "./CodeEditor";
 import Grader from "./Grader";
+import ModalSummary from "./Modal/ModalSummary";
+import ModalFinish from "./Modal/ModalFinish";
+import ModalUpload from "./Modal/ModalUpload";
 export default {
   name: "Utils",
   components: {
@@ -16,6 +19,9 @@ export default {
     Feedback,
     Grader,
     Loading,
+    ModalSummary,
+    ModalFinish,
+    ModalUpload,
   },
   props: {
     currentNumber: {
@@ -23,6 +29,7 @@ export default {
       default: 1,
     },
     testCases: Array,
+    maxScores: Array,
     duration: Number,
     floatingTimer: {
       type: Boolean,
@@ -59,6 +66,11 @@ export default {
         tries: [],
       },
 
+      modal: {
+        name: "",
+        active: false,
+      },
+
       loading: false,
       loadingType: "run",
       delay: 1000,
@@ -76,9 +88,9 @@ export default {
     clearInterval(this.remainingTimeInterval);
   },
   // computed: {
-  //   ...mapGetters({
-  //     examRemainingTime: "State/getRemainingTime",
-  //   }),
+  //   // ...mapGetters({
+  //   //   examRemainingTime: "State/getRemainingTime",
+  //   // }),
   // },
   watch: {
     currentNumber() {
@@ -89,6 +101,14 @@ export default {
     // ...mapActions({
     //   setExamRemainingTime: "State/setRemainingTime",
     // }),
+    openModal(val) {
+      this.modal.active = true;
+      this.modal.name = val;
+    },
+    closeModal() {
+      this.modal.active = false;
+      this.modal.name = "";
+    },
     changeNumber(val) {
       this.$emit("change-number", val);
     },
@@ -98,14 +118,11 @@ export default {
     typeAnswer(val) {
       this.userData.answer[this.currentNumber - 1][this.currentTab] = val;
     },
-    handleUpload(evt) {
-      const file = evt.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = e =>
-        (this.userData.answer[this.currentNumber - 1][this.currentTab] =
-          e.target.result);
-      reader.readAsText(file);
+    handleUpload(val) {
+      this.userData.answer[this.currentNumber - 1][this.currentTab] = val;
+    },
+    resetFile() {
+      this.tempFile = "";
     },
     fetchUserData() {
       this.exam.questions.map(el => {
@@ -137,10 +154,10 @@ export default {
     },
     run() {
       this.loading = true;
-      (this.loadingType = "run"),
-        setTimeout(() => {
-          this.loading = false;
-        }, this.delay);
+      this.loadingType = "run";
+      setTimeout(() => {
+        this.loading = false;
+      }, this.delay);
 
       // if there are user answer compile success, else compile error
       this.userData.status[this.currentNumber - 1] = this.userData.answer[
@@ -153,10 +170,10 @@ export default {
     submit() {
       if (this.userData.tries[this.currentNumber - 1] > 0) {
         this.loading = true;
-        (this.loadingType = "submit"),
-          setTimeout(() => {
-            this.loading = false;
-          }, this.delay);
+        this.loadingType = "submit";
+        setTimeout(() => {
+          this.loading = false;
+        }, this.delay);
 
         const tc = this.testCases[this.currentNumber - 1];
         let sum = 0;
@@ -181,6 +198,17 @@ export default {
         this.updateAnswer();
       }
     },
+    finish() {
+      this.updateAnswer();
+      let sum = 0;
+      for (let i = 0; i < this.userData.score.length; i++) {
+        sum += this.userData.score[i];
+      }
+      const grade = Math.floor(sum / this.userData.score.length);
+      this.$emit("update-exam", "grade", grade);
+      this.$emit("update-ls");
+      this.$router.push({ name: "Home" });
+    },
     async triggerTime() {
       let startTime;
       const currentDate = new Date();
@@ -203,10 +231,9 @@ export default {
         if (examRemainingTime <= 0) {
           if (this.isTimesUp === false) {
             this.isTimesUp = true;
-            // TODO: Change to Modal
+            this.openModal("finish");
             this.$emit("update-exam", "finished_at", currentDate.getTime());
             this.$emit("update-ls");
-            alert("Times up");
           }
         }
       }, 1000);
@@ -217,12 +244,34 @@ export default {
 
 <template>
   <div :class="$style.utils">
+    <ModalSummary
+      v-show="modal.active && modal.name === 'summary'"
+      :max-score="maxScores"
+      :user-data="userData"
+      :current-number="currentNumber"
+      :time="times"
+      @change-number="changeNumber"
+      @close="closeModal"
+    />
+    <ModalFinish
+      v-show="modal.active && modal.name === 'finish'"
+      :is-times-up="isTimesUp"
+      @finish="finish"
+      @close="closeModal"
+    />
+    <ModalUpload
+      v-show="modal.active && modal.name === 'upload'"
+      @upload="handleUpload"
+      @close="closeModal"
+    />
+
     <div :class="$style.floatingTimer" v-show="floatingTimer">
       <Timer :time="times" :is-float="true" />
     </div>
     <div :class="$style.upperSection">
       <div :class="$style.navSection">
         <Navigation
+          :max-score="maxScores"
           :user-data="userData"
           :current-number="currentNumber"
           @change-number="changeNumber"
@@ -234,12 +283,20 @@ export default {
         </div>
         <div :class="$style.btnGroup">
           <div>
-            <button class="btn btn-primary" :class="$style.summaryBtn">
+            <button
+              @click="openModal('summary')"
+              class="btn btn-primary"
+              :class="$style.summaryBtn"
+            >
               Summary
             </button>
           </div>
           <div>
-            <button class="btn btn-primary" :class="$style.finishBtn">
+            <button
+              @click="openModal('finish')"
+              class="btn btn-primary"
+              :class="$style.finishBtn"
+            >
               Finish Assignment
             </button>
           </div>
@@ -264,19 +321,11 @@ export default {
           @type-answer="typeAnswer"
         />
         <div :class="$style.bottomGroup">
-          <div :class="$style.input">
-            <!-- TODO: Change to modal action -->
-            <input
-              :disabled="disableElement()"
-              type="file"
-              id="upload"
-              hidden
-              @change="handleUpload"
-            />
-            <label :class="disableElement() ? $style.disabled : ''" for="upload"
-              ><font-awesome-icon icon="upload" :class="$style.icon" />Upload
-              code</label
-            >
+          <div
+            :class="[$style.input, disableElement() ? $style.disabled : '']"
+            @click="disableElement() || openModal('upload')"
+          >
+            <font-awesome-icon icon="upload" :class="$style.icon" />Upload code
           </div>
           <div>
             <div :class="$style.bottomBtn">
@@ -453,21 +502,18 @@ export default {
   align-items: center;
 
   .input {
+    cursor: pointer;
     .icon {
       margin-right: 1rem;
       font-size: 1.5rem;
     }
-    label {
-      cursor: pointer;
-      transition: 0.3s all ease;
 
-      &:hover {
-        opacity: 0.8;
-      }
+    &:hover {
+      opacity: 0.8;
+    }
 
-      &.disabled {
-        cursor: not-allowed;
-      }
+    &.disabled {
+      cursor: not-allowed;
     }
   }
 }

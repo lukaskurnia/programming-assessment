@@ -6,15 +6,20 @@ export default {
       type: Boolean,
       default: true,
     },
+    upload: {
+      type: Boolean,
+      default: false,
+    },
   },
 };
 </script>
 <template>
   <div :class="$style.loading">
-    <p v-if="run">Compiling your answer</p>
-    <p v-else>Grading your answer</p>
+    <p v-if="run && !upload">Compiling your answer</p>
+    <p v-if="!run && !upload">Grading your answer</p>
     <div :class="$style.loader"></div>
-    <p :class="$style.text">Result will be displayed here shortly</p>
+    <p v-if="upload" :class="$style.text">Uploading code..</p>
+    <p v-else :class="$style.text">Result will be displayed here shortly</p>
   </div>
 </template>
 

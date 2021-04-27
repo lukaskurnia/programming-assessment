@@ -6,15 +6,6 @@ export default {
     grade: Number,
     title: String,
     finished: Number,
-    // day: String,
-    // date: {
-    //   default: "",
-    //   type: String,
-    // },
-    // time: {
-    //   default: "",
-    //   type: String,
-    // },
   },
   computed: {
     datetime() {
@@ -32,7 +23,7 @@ export default {
     <div :class="$style.gradeBox">
       <p :class="$style.title">Grade</p>
       <div :class="$style.grade">
-        <p>{{ grade ? grade : "-" }}</p>
+        <p>{{ !finished ? "-" : grade ? grade : 0 }}</p>
       </div>
     </div>
     <div :class="$style.informationBox">
