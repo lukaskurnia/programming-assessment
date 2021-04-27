@@ -1,15 +1,40 @@
 <script>
+import { millisecondToTime } from "@/utils/datetime";
 export default {
-  name: "ModalFinish",
+  name: "StartExam",
   props: {
-    isTimesUp: {
+    duration: Number,
+    useTutorial: {
       type: Boolean,
       default: false,
     },
+    title: {
+      type: String,
+      default: "",
+    },
+  },
+  computed: {
+    time() {
+      let obj = millisecondToTime(this.duration);
+      const hour = obj.hours ? `${obj.hours} hours ` : "";
+      const minutes = obj.minutes ? `${obj.minutes} minutes ` : "";
+      const seconds = obj.seconds ? `${obj.seconds} seconds` : "";
+      return `${hour}${minutes}${seconds}`;
+    },
+    titletext() {
+      return this.title ? `${this.title}` : "Start assignment?";
+    },
   },
   methods: {
-    finish() {
-      this.$emit("finish");
+    reset() {
+      if (this.useTutorial) {
+        this.$emit("reset-tutorial");
+      } else {
+        this.$emit("close");
+      }
+    },
+    start() {
+      this.$emit("start-exam");
     },
   },
 };
@@ -17,27 +42,20 @@ export default {
 
 <template>
   <div :class="$style.backdrop">
-    <div :class="[$style.wrapper, isTimesUp ? $style.timesup : '']">
-      <p v-if="isTimesUp" :class="$style.title">Times Up!</p>
-      <p v-if="!isTimesUp" :class="$style.title">Finish Assignment</p>
-      <font-awesome-icon
-        v-if="!isTimesUp"
-        :class="$style.icon"
-        icon="exclamation-circle"
-      />
-      <p v-if="!isTimesUp" :class="$style.subtitle">
-        Are you sure you want to finish the assignment?
+    <div :class="$style.wrapper">
+      <p :class="$style.title">{{ titletext }}</p>
+      <p :class="$style.subtitle">
+        You have <b>{{ time }}</b> to solve this assignments
       </p>
       <div :class="$style.btnGroup">
         <button
-          v-if="!isTimesUp"
-          @click="$emit('close')"
+          @click="reset"
+          :class="$style.resetBtn"
           class="btn btn-primary--alt"
-          :class="$style.customBtn"
         >
-          Cancel
+          {{ useTutorial ? "See tutorial" : "Cancel" }}
         </button>
-        <button @click="finish" class="btn btn-primary">Finish</button>
+        <button @click="start" class="btn btn-primary">Start</button>
       </div>
     </div>
   </div>
@@ -61,10 +79,6 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  &.timesup {
-    width: 40%;
-  }
 }
 .backdrop {
   top: 0;
@@ -81,6 +95,7 @@ export default {
 }
 
 .title {
+  text-align: center;
   font-size: 2rem;
   font-weight: bold;
 }
@@ -97,12 +112,12 @@ export default {
 }
 
 .btnGroup {
-  margin-top: 2rem;
+  margin-top: 4rem;
   display: flex;
   width: 100%;
   justify-content: center;
 
-  .customBtn {
+  .resetBtn {
     border: 1px solid $primary;
   }
 
@@ -111,7 +126,7 @@ export default {
     max-width: 228px;
 
     &:not(:first-child) {
-      margin-left: 4rem;
+      margin-left: 8rem;
     }
   }
 }

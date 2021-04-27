@@ -2,6 +2,7 @@ export const EXAMS = [
   {
     id_event: 2,
     title: "Assignment 2",
+    duration: 3600000,
     grade: null,
     started_at: null,
     finished_at: null,
@@ -17,6 +18,7 @@ export const EXAMS = [
   {
     id_event: 3,
     title: "Assignment 3",
+    duration: 310000,
     grade: null,
     started_at: null,
     finished_at: null,
@@ -32,6 +34,7 @@ export const EXAMS = [
   {
     id_event: 4,
     title: "Assignment 4",
+    duration: 310000,
     grade: null,
     started_at: null,
     finished_at: null,
@@ -47,6 +50,7 @@ export const EXAMS = [
   {
     id_event: 5,
     title: "Assignment 5",
+    duration: 310000,
     grade: null,
     started_at: null,
     finished_at: null,
@@ -62,6 +66,7 @@ export const EXAMS = [
   {
     id_event: 1,
     title: "Assignment 1",
+    duration: 310000,
     grade: 100,
     started_at: 1619379402118,
     finished_at: 1619379412118,

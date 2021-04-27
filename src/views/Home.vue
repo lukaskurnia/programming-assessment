@@ -1,20 +1,32 @@
 <script>
+import { mapActions, mapGetters } from "vuex";
 import AssignmentCard from "@/components/AssignmentCard";
 import ResetButton from "@/components/ResetButton";
+import StartExam from "./Event/components/Modal/StartExam";
 import { EXAMS } from "@/constants/exam";
 export default {
   name: "Home",
-  components: { AssignmentCard, ResetButton },
+  components: { AssignmentCard, ResetButton, StartExam },
   data() {
     return {
       course: "IF 1210 - Dasar Pemrograman",
       exams: EXAMS,
+      modal: false,
+      selectedEvent: {
+        duration: null,
+        id: null,
+        title: "",
+      },
     };
   },
   created() {
     this.initialize();
+    this.checkUserFirstTime();
   },
   computed: {
+    ...mapGetters({
+      tutorialStep: "State/getTutorialStep",
+    }),
     unfinished() {
       const data = this.exams.filter(el => {
         return el.finished_at === null;
@@ -41,12 +53,38 @@ export default {
     },
   },
   methods: {
+    ...mapActions({
+      setStep: "State/setTutorialStep",
+    }),
     initialize() {
       if (!localStorage.getItem("exam")) {
         localStorage.setItem("exam", JSON.stringify(this.exams));
       } else {
         this.exams = JSON.parse(localStorage.getItem("exam"));
       }
+    },
+    checkUserFirstTime() {
+      // 1 = first time. 0 = not first time
+      let firstTime;
+      if (localStorage.getItem("first_time")) {
+        firstTime = parseInt(localStorage.getItem("first_time"));
+      } else {
+        firstTime = 1;
+        localStorage.setItem("first_time", firstTime);
+      }
+      if (firstTime && this.tutorialStep === -1) {
+        // case step 0 then start tutorial
+        this.setStep(0);
+      }
+    },
+    handleModal(id, duration, title) {
+      this.modal = true;
+      this.selectedEvent.id = id;
+      this.selectedEvent.duration = duration;
+      this.selectedEvent.title = title;
+    },
+    closeModal() {
+      this.modal = false;
     },
     navigate(id) {
       this.$router.push({ name: "Event", params: { id_event: id } });
@@ -57,6 +95,13 @@ export default {
 
 <template>
   <div :class="$style.home">
+    <StartExam
+      v-show="modal"
+      :duration="selectedEvent.duration"
+      :title="selectedEvent.title"
+      @close="closeModal"
+      @start-exam="navigate(selectedEvent.id)"
+    />
     <div :class="$style.header">{{ course }}</div>
     <div :class="$style.body">
       <p :class="$style.title">Your assignments:</p>
@@ -69,7 +114,15 @@ export default {
             :key="idx"
           >
             <AssignmentCard
-              @click="navigate(assignment.id_event)"
+              @click="
+                assignment.started_at
+                  ? navigate(assignment.id_event)
+                  : handleModal(
+                      assignment.id_event,
+                      assignment.duration,
+                      assignment.title
+                    )
+              "
               :grade="assignment.grade"
               :title="assignment.title"
             />

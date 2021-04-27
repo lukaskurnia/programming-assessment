@@ -1,15 +1,12 @@
 <script>
 export default {
-  name: "ModalFinish",
-  props: {
-    isTimesUp: {
-      type: Boolean,
-      default: false,
-    },
-  },
+  name: "StartTutorial",
   methods: {
-    finish() {
-      this.$emit("finish");
+    skip() {
+      this.$emit("skip");
+    },
+    next() {
+      this.$emit("next-step");
     },
   },
 };
@@ -17,27 +14,20 @@ export default {
 
 <template>
   <div :class="$style.backdrop">
-    <div :class="[$style.wrapper, isTimesUp ? $style.timesup : '']">
-      <p v-if="isTimesUp" :class="$style.title">Times Up!</p>
-      <p v-if="!isTimesUp" :class="$style.title">Finish Assignment</p>
-      <font-awesome-icon
-        v-if="!isTimesUp"
-        :class="$style.icon"
-        icon="exclamation-circle"
-      />
-      <p v-if="!isTimesUp" :class="$style.subtitle">
-        Are you sure you want to finish the assignment?
+    <div :class="$style.wrapper">
+      <p :class="$style.title">
+        Hi, It seem’s like you are new with this programming assessment !
       </p>
+      <p :class="$style.subtitle">Do you want to see tutorial?</p>
       <div :class="$style.btnGroup">
         <button
-          v-if="!isTimesUp"
-          @click="$emit('close')"
+          @click="skip"
+          :class="$style.skipBtn"
           class="btn btn-primary--alt"
-          :class="$style.customBtn"
         >
-          Cancel
+          No, skip tutorial
         </button>
-        <button @click="finish" class="btn btn-primary">Finish</button>
+        <button @click="next" class="btn btn-primary">Yes, show me!</button>
       </div>
     </div>
   </div>
@@ -61,10 +51,6 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  &.timesup {
-    width: 40%;
-  }
 }
 .backdrop {
   top: 0;
@@ -81,6 +67,7 @@ export default {
 }
 
 .title {
+  text-align: center;
   font-size: 2rem;
   font-weight: bold;
 }
@@ -97,12 +84,12 @@ export default {
 }
 
 .btnGroup {
-  margin-top: 2rem;
+  margin-top: 4rem;
   display: flex;
   width: 100%;
   justify-content: center;
 
-  .customBtn {
+  .skipBtn {
     border: 1px solid $primary;
   }
 
@@ -111,7 +98,7 @@ export default {
     max-width: 228px;
 
     &:not(:first-child) {
-      margin-left: 4rem;
+      margin-left: 8rem;
     }
   }
 }

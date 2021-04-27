@@ -13,6 +13,7 @@ import {
   faUpload,
   faExclamationCircle,
   faStopwatch,
+  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -20,6 +21,7 @@ library.add(
   faUserCircle,
   faChevronDown,
   faChevronCircleRight,
+  faChevronRight,
   faCheckCircle,
   faTimes,
   faClock,
