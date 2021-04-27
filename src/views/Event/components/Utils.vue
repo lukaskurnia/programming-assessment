@@ -1,4 +1,5 @@
 <script>
+// import { mapGetters, mapActions } from "vuex";
 import { millisecondToTime } from "@/utils/datetime";
 import Feedback from "./Feedback";
 import Navigation from "./Navigation";
@@ -21,6 +22,10 @@ export default {
     },
     testCases: Array,
     duration: Number,
+    floatingTimer: {
+      type: Boolean,
+      default: false,
+    },
     exam: Object,
     // exam contain: {
     //   score: Number,
@@ -64,12 +69,20 @@ export default {
     clearInterval(this.saveStorageInterval);
     clearInterval(this.remainingTimeInterval);
   },
+  // computed: {
+  //   ...mapGetters({
+  //     examRemainingTime: "State/getRemainingTime",
+  //   }),
+  // },
   watch: {
     currentNumber() {
       this.currentTab = 0;
     },
   },
   methods: {
+    // ...mapActions({
+    //   setExamRemainingTime: "State/setRemainingTime",
+    // }),
     changeNumber(val) {
       this.$emit("change-number", val);
     },
@@ -180,6 +193,9 @@ export default {
 
 <template>
   <div :class="$style.utils">
+    <div :class="$style.floatingTimer" v-show="floatingTimer">
+      <Timer :time="times" :is-float="true" />
+    </div>
     <div :class="$style.upperSection">
       <div :class="$style.navSection">
         <Navigation
@@ -277,6 +293,14 @@ export default {
 </template>
 
 <style lang="scss" module>
+.floatingTimer {
+  position: fixed;
+  top: 2rem;
+  right: 3rem;
+  z-index: 6;
+  animation: showUp ease 0.3s;
+}
+
 .utils {
   width: 100%;
   background: white;
@@ -284,6 +308,7 @@ export default {
   padding: 2rem;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .upperSection {
@@ -332,10 +357,6 @@ export default {
       background-color: lighten($primary, 10);
     }
 
-    // white-space: nowrap;
-    // overflow: hidden;
-    // text-overflow: ellipsis;
-
     &.active {
       z-index: 1;
       font-weight: bold;
@@ -343,7 +364,6 @@ export default {
       background: white;
       box-shadow: none;
       filter: drop-shadow(0px -4px 4px rgba(0, 0, 0, 0.12));
-      // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 
       &:hover {
         background-color: lighten(white, 10);
@@ -368,12 +388,10 @@ export default {
 
 .bottomBtn {
   display: flex;
-  // width: 300px;
 
   button {
     flex: 1;
     min-width: 203px;
-    // width: 100%;
     &:not(:first-child) {
       margin-left: 1rem;
     }
@@ -407,6 +425,17 @@ export default {
         opacity: 0.8;
       }
     }
+  }
+}
+
+@keyframes showUp {
+  0% {
+    transform: translate(0, -3px) scale(1);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
   }
 }
 </style>
