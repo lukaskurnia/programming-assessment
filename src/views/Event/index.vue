@@ -16,6 +16,7 @@ export default {
       exams: EXAMS,
       currentNumber: 1,
       totalQuestion: 1,
+      floatingTimer: false,
     };
   },
   created() {
@@ -63,7 +64,9 @@ export default {
     },
     addOnScrollEvent() {
       const $header = document.getElementById("header");
-      // console.log(window.pageYOffset); //400 show timer
+      setTimeout(() => {
+        this.floatingTimer = window.pageYOffset > 400 ? true : false;
+      }, 100);
       $header.style.zIndex = window.pageYOffset > 10 ? 5 : 0;
       $header.style.boxShadow =
         window.pageYOffset > 10 ? "0 2px 8px rgba(0,0,0,0.12)" : "none";
@@ -120,6 +123,7 @@ export default {
           :duration="event.duration"
           :exam="currentExam"
           :test-cases="event.test_case"
+          :floating-timer="floatingTimer"
           @update-exam="updateUserExams"
           @update-ls="updateLS"
           @change-number="changeNumber"

@@ -11,6 +11,10 @@ export default {
       // in milisecond
       type: Object,
     },
+    isFloat: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
     timeString(val) {
@@ -30,7 +34,7 @@ export default {
 </script>
 
 <template>
-  <div :class="$style.timer">
+  <div :class="$style.timer" v-if="!isFloat">
     <p :class="$style.title">Time left:</p>
     <div :class="$style.timeBox">
       <div :class="[$style.card, isLimit() ? $style.blink : '']">
@@ -53,19 +57,55 @@ export default {
       </div>
     </div>
   </div>
+  <div v-else>
+    <p :class="$style.floatTitle">Time left:</p>
+    <div :class="$style.float">
+      <font-awesome-icon icon="clock" :class="$style.icon" />
+      <p :class="isLimit() ? $style.blink : ''">
+        {{
+          `${timeString(time.hours)}:${timeString(time.minutes)}:${timeString(
+            time.seconds
+          )}`
+        }}
+      </p>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" module>
+.float {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  color: $primary;
+  margin-top: 0.5rem;
+  font-weight: bold;
+
+  .icon {
+    margin-right: 0.5rem;
+    margin-bottom: 4px;
+  }
+
+  &Title {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .blink {
+    color: $danger;
+    animation: blinker 1.5s linear infinite;
+  }
+}
+
 .timer {
   width: 100%;
   background: white;
   padding: 1rem;
-
-  .title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-align: center;
-  }
+}
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
 }
 .timeBox {
   display: grid;
@@ -96,17 +136,16 @@ export default {
 
     &.blink {
       animation: blinker 1.5s linear infinite;
-
-      @keyframes blinker {
-        50% {
-          opacity: 0.5;
-        }
-      }
     }
   }
 
   .label {
     font-size: 1.5rem;
+  }
+}
+@keyframes blinker {
+  50% {
+    opacity: 0.5;
   }
 }
 </style>
