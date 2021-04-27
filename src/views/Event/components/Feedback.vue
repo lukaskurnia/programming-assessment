@@ -2,13 +2,6 @@
 export default {
   name: "Feedback",
   props: {
-    // feedbackType: {
-    //   type: String,
-    //   validator: value => {
-    //     return ["run", "submit"].indexOf(value) !== -1;
-    //   },
-    //   default: "run",
-    // },
     status: {
       type: String,
       validator: value => {

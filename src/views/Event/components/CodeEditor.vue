@@ -10,6 +10,10 @@ export default {
       type: String,
       default: "",
     },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -44,7 +48,7 @@ export default {
       :options="cmOptions"
       :mode="mode"
       :autoheight="true"
-      :readonly="false"
+      :readonly="readonly"
       @update:value="changeCode"
     />
   </div>

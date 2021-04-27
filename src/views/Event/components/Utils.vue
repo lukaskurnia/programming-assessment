@@ -1,6 +1,7 @@
 <script>
 // import { mapGetters, mapActions } from "vuex";
 import { millisecondToTime } from "@/utils/datetime";
+import Loading from "@/components/Loading";
 import Feedback from "./Feedback";
 import Navigation from "./Navigation";
 import Timer from "./Timer";
@@ -14,6 +15,7 @@ export default {
     CodeEditor,
     Feedback,
     Grader,
+    Loading,
   },
   props: {
     currentNumber: {
@@ -56,6 +58,10 @@ export default {
         score: [],
         tries: [],
       },
+
+      loading: false,
+      loadingType: "run",
+      delay: 1000,
     };
   },
   created() {
@@ -123,7 +129,19 @@ export default {
       this.$emit("update-exam", "questions", data);
       this.$emit("update-ls");
     },
+    disableElement() {
+      return (
+        this.userData.tries[this.currentNumber - 1] === 0 ||
+        this.userData.status[this.currentNumber - 1] === "submit-success"
+      );
+    },
     run() {
+      this.loading = true;
+      (this.loadingType = "run"),
+        setTimeout(() => {
+          this.loading = false;
+        }, this.delay);
+
       // if there are user answer compile success, else compile error
       this.userData.status[this.currentNumber - 1] = this.userData.answer[
         this.currentNumber - 1
@@ -134,6 +152,12 @@ export default {
     },
     submit() {
       if (this.userData.tries[this.currentNumber - 1] > 0) {
+        this.loading = true;
+        (this.loadingType = "submit"),
+          setTimeout(() => {
+            this.loading = false;
+          }, this.delay);
+
         const tc = this.testCases[this.currentNumber - 1];
         let sum = 0;
         let countZero = 0;
@@ -235,14 +259,21 @@ export default {
           </div>
         </div>
         <CodeEditor
+          :readonly="disableElement()"
           :code="userData.answer[currentNumber - 1][currentTab]"
           @type-answer="typeAnswer"
         />
         <div :class="$style.bottomGroup">
           <div :class="$style.input">
             <!-- TODO: Change to modal action -->
-            <input type="file" id="upload" hidden @change="handleUpload" />
-            <label for="upload"
+            <input
+              :disabled="disableElement()"
+              type="file"
+              id="upload"
+              hidden
+              @change="handleUpload"
+            />
+            <label :class="disableElement() ? $style.disabled : ''" for="upload"
               ><font-awesome-icon icon="upload" :class="$style.icon" />Upload
               code</label
             >
@@ -253,6 +284,7 @@ export default {
                 @click="run"
                 class="btn btn-primary--alt"
                 :class="$style.runBtn"
+                :disabled="disableElement()"
               >
                 Run
               </button>
@@ -261,6 +293,7 @@ export default {
                   userData.status[currentNumber - 1] &&
                   userData.status[currentNumber - 1] !== 'run-error'
                 "
+                :disabled="disableElement()"
                 class="btn btn-primary"
                 :class="$style.submitBtn"
                 @click="submit"
@@ -272,9 +305,12 @@ export default {
         </div>
       </div>
     </div>
+    <div :class="$style.loadingSection" v-if="loading">
+      <Loading :run="loadingType === 'run'" />
+    </div>
     <div
       :class="$style.bottomSection"
-      v-if="userData.status[currentNumber - 1]"
+      v-if="userData.status[currentNumber - 1] && !loading"
     >
       <div>
         <Feedback :status="userData.status[currentNumber - 1]" />
@@ -331,6 +367,10 @@ export default {
 
 .graderSection {
   margin-top: 1.5rem;
+}
+
+.loadingSection {
+  margin-top: 2rem;
 }
 
 .codeHeader {
@@ -423,6 +463,10 @@ export default {
 
       &:hover {
         opacity: 0.8;
+      }
+
+      &.disabled {
+        cursor: not-allowed;
       }
     }
   }
