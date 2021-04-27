@@ -204,7 +204,9 @@ export default {
       for (let i = 0; i < this.userData.score.length; i++) {
         sum += this.userData.score[i];
       }
+      const currentDate = new Date();
       const grade = Math.floor(sum / this.userData.score.length);
+      this.$emit("update-exam", "finished_at", currentDate.getTime());
       this.$emit("update-exam", "grade", grade);
       this.$emit("update-ls");
       this.$router.push({ name: "Home" });
@@ -232,8 +234,6 @@ export default {
           if (this.isTimesUp === false) {
             this.isTimesUp = true;
             this.openModal("finish");
-            this.$emit("update-exam", "finished_at", currentDate.getTime());
-            this.$emit("update-ls");
           }
         }
       }, 1000);
