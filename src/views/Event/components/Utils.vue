@@ -8,6 +8,7 @@ import Timer from "./Timer";
 import CodeEditor from "./CodeEditor";
 import Grader from "./Grader";
 import ModalSummary from "./Modal/ModalSummary";
+import ModalFinish from "./Modal/ModalFinish";
 export default {
   name: "Utils",
   components: {
@@ -18,6 +19,7 @@ export default {
     Grader,
     Loading,
     ModalSummary,
+    ModalFinish,
   },
   props: {
     currentNumber: {
@@ -197,6 +199,17 @@ export default {
         this.updateAnswer();
       }
     },
+    finish() {
+      this.updateAnswer();
+      let sum = 0;
+      for (let i = 0; i < this.userData.score.length; i++) {
+        sum += this.userData.score[i];
+      }
+      const grade = Math.floor(sum / this.userData.score.length);
+      this.$emit("update-exam", "grade", grade);
+      this.$emit("update-ls");
+      this.$router.push({ name: "Home" });
+    },
     async triggerTime() {
       let startTime;
       const currentDate = new Date();
@@ -219,10 +232,9 @@ export default {
         if (examRemainingTime <= 0) {
           if (this.isTimesUp === false) {
             this.isTimesUp = true;
-            // TODO: Change to Modal
+            this.openModal("finish");
             this.$emit("update-exam", "finished_at", currentDate.getTime());
             this.$emit("update-ls");
-            alert("Times up");
           }
         }
       }, 1000);
@@ -240,6 +252,12 @@ export default {
       :current-number="currentNumber"
       :time="times"
       @change-number="changeNumber"
+      @close="closeModal"
+    />
+    <ModalFinish
+      v-show="modal.active && modal.name === 'finish'"
+      :is-times-up="isTimesUp"
+      @finish="finish"
       @close="closeModal"
     />
 
@@ -270,7 +288,11 @@ export default {
             </button>
           </div>
           <div>
-            <button class="btn btn-primary" :class="$style.finishBtn">
+            <button
+              @click="openModal('finish')"
+              class="btn btn-primary"
+              :class="$style.finishBtn"
+            >
               Finish Assignment
             </button>
           </div>

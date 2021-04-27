@@ -104,9 +104,9 @@ export default {
         icon="times"
       />
       <div :class="$style.header">
-        <p :class="[$style.time, isLimit() ? $style.blink : '']">
+        <p :class="$style.time">
           Time left:
-          <span
+          <span :class="isLimit() ? $style.blink : ''"
             >{{ timeString(time.hours) }}:{{ timeString(time.minutes) }}:{{
               timeString(time.seconds)
             }}
@@ -304,7 +304,7 @@ export default {
 }
 
 .blink {
-  color: $danger;
+  color: $danger !important;
   animation: blinker 1.5s linear infinite;
 }
 
