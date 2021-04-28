@@ -89,6 +89,9 @@ export default {
     navigate(id) {
       this.$router.push({ name: "Event", params: { id_event: id } });
     },
+    navigateExplanatory(id) {
+      this.$router.push({ name: "Explanatory", params: { id_event: id } });
+    },
   },
 };
 </script>
@@ -139,7 +142,7 @@ export default {
             :key="idx"
           >
             <AssignmentCard
-              @click="navigate(assignment.id_event)"
+              @click="navigateExplanatory(assignment.id_event)"
               :grade="assignment.grade"
               :title="assignment.title"
               :finished="assignment.finished_at"
