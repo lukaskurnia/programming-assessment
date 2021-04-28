@@ -16,6 +16,31 @@ export default {
       // in milisecond
       type: Object,
     },
+
+    isReview: {
+      type: Boolean,
+      default: false,
+    },
+    grade: {
+      type: Number,
+      default: 0,
+    },
+  },
+  computed: {
+    total() {
+      let sum = 0;
+      for (let item of this.maxScore) {
+        sum += item;
+      }
+      return sum;
+    },
+    marks() {
+      let sum = 0;
+      for (let item of this.userData.score) {
+        sum += item;
+      }
+      return sum;
+    },
   },
   methods: {
     timeString(val) {
@@ -37,9 +62,10 @@ export default {
     },
     displayedScore(num) {
       if (
-        this.userData.status[num] &&
-        this.userData.status[num] !== "run-error" &&
-        this.userData.status[num] !== "run-success"
+        this.isReview ||
+        (this.userData.status[num] &&
+          this.userData.status[num] !== "run-error" &&
+          this.userData.status[num] !== "run-success")
       ) {
         return `${this.userData.score[num]}/${this.maxScore[num]}`;
       }
@@ -49,13 +75,16 @@ export default {
       if (this.userData.status[num] === "submit-success") {
         return "Correct";
       } else if (this.userData.status[num] === "submit-wrong") {
-        if (this.userData.tries[num] === 0) {
+        if (this.userData.tries[num] === 0 || this.isReview) {
           return "Incorrect";
         }
       } else if (this.userData.status[num] === "submit-partial") {
-        if (this.userData.tries[num] === 0) {
+        if (this.userData.tries[num] === 0 || this.isReview) {
           return "Partially correct";
         }
+      }
+      if (this.isReview) {
+        return "Incorrect";
       }
       return `Tries remaining: ${this.userData.tries[num]}`;
     },
@@ -65,13 +94,18 @@ export default {
       if (this.userData.status[num] === "submit-success") {
         style.push(successColor);
       } else if (this.userData.status[num] === "submit-wrong") {
-        if (this.userData.tries[num] === 0) {
+        if (this.userData.tries[num] === 0 || this.isReview) {
           style.push(wrongColor);
         }
       } else if (this.userData.status[num] === "submit-partial") {
-        if (this.userData.tries[num] === 0) {
+        if (this.userData.tries[num] === 0 || this.isReview) {
           style.push(partialColor);
         }
+      } else if (
+        this.isReview &&
+        this.userData.tries[this.currentNumber - 1] > 0
+      ) {
+        style.push(wrongColor);
       }
       return style;
     },
@@ -85,7 +119,7 @@ export default {
           style.push(successBg);
         } else if (status === "submit-partial") {
           style.push(partialBg);
-        } else if (status === "submit-wrong") {
+        } else if (status === "submit-wrong" || this.isReview) {
           style.push(wrongBg);
         }
       }
@@ -104,7 +138,7 @@ export default {
         icon="times"
       />
       <div :class="$style.header">
-        <p :class="$style.time">
+        <p :class="$style.time" v-if="!isReview">
           Time left:
           <span :class="isLimit() ? $style.blink : ''"
             >{{ timeString(time.hours) }}:{{ timeString(time.minutes) }}:{{
@@ -112,6 +146,20 @@ export default {
             }}
           </span>
         </p>
+        <div v-else>
+          <div :class="$style.info">
+            <p>Marks</p>
+            <span>:</span>
+            <p :class="$style.mark">
+              <b>{{ marks }}/{{ total }}</b>
+            </p>
+            <p>Grade</p>
+            <span>:</span>
+            <p :class="$style.grade">
+              <b>{{ grade }}/100</b>
+            </p>
+          </div>
+        </div>
         <p :class="$style.title">Summary</p>
       </div>
       <div :class="$style.container">
@@ -168,6 +216,17 @@ export default {
 .header {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+
+  // &.noTime {
+  //   display: block;
+  //   text-align: center;
+  // }
+}
+
+.info {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 0.5rem;
 }
 
 .title {

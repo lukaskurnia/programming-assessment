@@ -122,7 +122,6 @@ export default {
         // For tutorial purpose only
         this.userData.status[this.currentNumber - 1] = "run-success";
         setTimeout(() => {
-          console.log("a");
           this.scrollTo("step-6");
         }, 1000);
       } else if (val === 7) {
@@ -166,9 +165,6 @@ export default {
     },
     handleUpload(val) {
       this.userData.answer[this.currentNumber - 1][this.currentTab] = val;
-    },
-    resetFile() {
-      this.tempFile = "";
     },
     fetchUserData() {
       this.exam.questions.map(el => {
@@ -216,6 +212,7 @@ export default {
         ? "run-success"
         : "run-error";
       this.updateAnswer();
+      this.scrollTo("step-6");
     },
     submit() {
       if (this.userData.tries[this.currentNumber - 1] > 0) {
@@ -246,6 +243,7 @@ export default {
           this.userData.tries[this.currentNumber - 1]--;
         }
         this.updateAnswer();
+        this.scrollTo("grader");
       }
     },
     finish() {
@@ -330,6 +328,7 @@ export default {
     <div :class="$style.upperSection">
       <div
         :class="[
+          $style.nav,
           $style.tutorialWrapper,
           tutorialStep === 2 ? $style.highlighted : '',
         ]"
@@ -528,7 +527,7 @@ export default {
           userData.status[currentNumber - 1] !== 'run-error'
         "
       >
-        <Grader :test-case="testCases[currentNumber - 1]" />
+        <Grader id="grader" :test-case="testCases[currentNumber - 1]" />
       </div>
     </div>
   </div>
@@ -541,6 +540,10 @@ export default {
   right: 3rem;
   z-index: 6;
   animation: showUp ease 0.3s;
+}
+
+.nav {
+  align-self: center;
 }
 
 .utils {

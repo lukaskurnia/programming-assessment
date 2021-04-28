@@ -12,13 +12,19 @@ export default {
     },
     maxScore: Array,
     userData: Object,
+
+    isReview: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     displayedScore() {
       if (
-        this.userData.status[this.currentNumber - 1] &&
-        this.userData.status[this.currentNumber - 1] !== "run-error" &&
-        this.userData.status[this.currentNumber - 1] !== "run-success"
+        this.isReview ||
+        (this.userData.status[this.currentNumber - 1] &&
+          this.userData.status[this.currentNumber - 1] !== "run-error" &&
+          this.userData.status[this.currentNumber - 1] !== "run-success")
       ) {
         return `${this.userData.score[this.currentNumber - 1]}/${
           this.maxScore[this.currentNumber - 1]
@@ -32,15 +38,24 @@ export default {
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-wrong"
       ) {
-        if (this.userData.tries[this.currentNumber - 1] === 0) {
+        if (
+          this.userData.tries[this.currentNumber - 1] === 0 ||
+          this.isReview
+        ) {
           return "Incorrect";
         }
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-partial"
       ) {
-        if (this.userData.tries[this.currentNumber - 1] === 0) {
+        if (
+          this.userData.tries[this.currentNumber - 1] === 0 ||
+          this.isReview
+        ) {
           return "Partially correct";
         }
+      }
+      if (this.isReview) {
+        return "Incorrect";
       }
       return `Tries remaining: ${this.userData.tries[this.currentNumber - 1]}`;
     },
@@ -52,15 +67,26 @@ export default {
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-wrong"
       ) {
-        if (this.userData.tries[this.currentNumber - 1] === 0) {
+        if (
+          this.userData.tries[this.currentNumber - 1] === 0 ||
+          this.isReview
+        ) {
           style.push(wrongColor);
         }
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-partial"
       ) {
-        if (this.userData.tries[this.currentNumber - 1] === 0) {
+        if (
+          this.userData.tries[this.currentNumber - 1] === 0 ||
+          this.isReview
+        ) {
           style.push(partialColor);
         }
+      } else if (
+        this.isReview &&
+        this.userData.tries[this.currentNumber - 1] > 0
+      ) {
+        style.push(wrongColor);
       }
       return style;
     },
@@ -76,7 +102,7 @@ export default {
           style.push(successBg);
         } else if (status === "submit-partial") {
           style.push(partialBg);
-        } else if (status === "submit-wrong") {
+        } else if (status === "submit-wrong" || this.isReview) {
           style.push(wrongBg);
         }
       }
