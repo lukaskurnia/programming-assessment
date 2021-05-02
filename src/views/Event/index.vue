@@ -157,6 +157,7 @@ export default {
     <StartExam
       v-show="tutorialStep === 8"
       :duration="event.duration"
+      :use-tutorial="true"
       @reset-tutorial="setStep(1)"
       @start-exam="startExam"
     />
