@@ -1,5 +1,7 @@
 # programming-assessment
 
-## A programming assessment simulator
+Simple programming assessment simulator for Situs Kuliah ITB
 
-### Development repository for TA 2
+created by: **Lukas Kurnia Jonathan (13517006)**
+
+_Bandung Institute of Technology_
