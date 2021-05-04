@@ -85,7 +85,7 @@ export const EXAMS = [
   {
     id_event: 3,
     title: "Assignment 3",
-    duration: 310000,
+    duration: 305000,
     grade: null,
     started_at: null,
     finished_at: null,
