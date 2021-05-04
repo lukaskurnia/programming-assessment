@@ -158,7 +158,7 @@ export const EVENT_DATA = [
   {
     id_event: 3,
     name: "Assignment 3",
-    duration: 310000,
+    duration: 305000,
     max_score: [100],
     test_case: [[50, 0]],
     questions: [
