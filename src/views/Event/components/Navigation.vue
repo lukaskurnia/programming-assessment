@@ -33,31 +33,24 @@ export default {
       return this.userData.score[this.currentNumber - 1];
     },
     tries() {
+      return `Tries remaining: ${this.userData.tries[this.currentNumber - 1]}`;
+    },
+    status() {
       if (this.userData.status[this.currentNumber - 1] === "submit-success") {
         return "Correct";
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-wrong"
       ) {
-        if (
-          this.userData.tries[this.currentNumber - 1] === 0 ||
-          this.isReview
-        ) {
-          return "Incorrect";
-        }
+        return "Incorrect";
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-partial"
       ) {
-        if (
-          this.userData.tries[this.currentNumber - 1] === 0 ||
-          this.isReview
-        ) {
-          return "Partially correct";
-        }
+        return "Partially correct";
       }
       if (this.isReview) {
         return "Incorrect";
       }
-      return `Tries remaining: ${this.userData.tries[this.currentNumber - 1]}`;
+      return "";
     },
     triesClass() {
       const { tries, successColor, wrongColor, partialColor } = this.$style;
@@ -67,21 +60,11 @@ export default {
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-wrong"
       ) {
-        if (
-          this.userData.tries[this.currentNumber - 1] === 0 ||
-          this.isReview
-        ) {
-          style.push(wrongColor);
-        }
+        style.push(wrongColor);
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-partial"
       ) {
-        if (
-          this.userData.tries[this.currentNumber - 1] === 0 ||
-          this.isReview
-        ) {
-          style.push(partialColor);
-        }
+        style.push(partialColor);
       } else if (
         this.isReview &&
         this.userData.tries[this.currentNumber - 1] > 0
@@ -128,7 +111,17 @@ export default {
     <p :class="$style.score">
       Score: <span :class="$style.value">{{ displayedScore }}</span>
     </p>
-    <p :class="triesClass">{{ tries }}</p>
+    <p :class="triesClass">{{ status }}</p>
+    <p
+      v-if="
+        userData.tries[currentNumber - 1] > 0 &&
+        userData.status[currentNumber - 1] !== 'submit-success' &&
+        !isReview
+      "
+      :class="$style.tries"
+    >
+      {{ tries }}
+    </p>
   </div>
 </template>
 
