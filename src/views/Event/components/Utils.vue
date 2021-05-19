@@ -387,7 +387,7 @@ export default {
             <div>
               <button
                 @click="this.tutorialStep === -1 && openModal('summary')"
-                class="btn btn-primary"
+                class="btn btn-primary--alt"
                 :class="$style.summaryBtn"
               >
                 Summary
