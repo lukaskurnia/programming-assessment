@@ -1,6 +1,7 @@
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faBars,
+  faLaptopCode,
   faUserCircle,
   faChevronDown,
   faChevronCircleRight,
@@ -18,6 +19,7 @@ import {
 
 library.add(
   faBars,
+  faLaptopCode,
   faUserCircle,
   faChevronDown,
   faChevronCircleRight,

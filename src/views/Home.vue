@@ -128,6 +128,7 @@ export default {
               "
               :grade="assignment.grade"
               :title="assignment.title"
+              :ongoing="assignment.started_at ? true : false"
             />
           </div>
         </div>
