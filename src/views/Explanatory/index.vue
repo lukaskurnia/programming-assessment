@@ -144,12 +144,13 @@ export default {
   }
 
   .reviewBadge {
-    background: $primary;
+    background: #c9c9c9;
     color: white;
-    width: 125px;
+    width: 100px;
     text-align: center;
     padding: 0.5rem;
     margin-left: 1rem;
+    border-radius: 0.25rem;
     font-weight: bold;
   }
 

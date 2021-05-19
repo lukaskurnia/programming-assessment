@@ -50,7 +50,7 @@ export default {
         case "submit-wrong":
           return "Your answer is incorrect!";
         case "submit-partial":
-          return "Your answer is partially correct, better luck next time :{";
+          return "Your answer is partially correct, better luck next time :(";
         default:
           return "Your answer is correct!";
       }
@@ -104,7 +104,7 @@ export default {
     />
     <font-awesome-icon
       :class="$style.icon"
-      icon="times"
+      icon="times-circle"
       v-else-if="dangerIndicator"
     />
   </div>

@@ -12,13 +12,42 @@ export default {
     },
     maxScore: Array,
     userData: Object,
-
     isReview: {
       type: Boolean,
       default: false,
     },
   },
+  data() {
+    return {
+      currentPage: 1,
+      pageSize: 10,
+    };
+  },
+  watch: {
+    currentNumber(val) {
+      this.currentPage = Math.ceil(val / this.pageSize);
+    },
+  },
   computed: {
+    numberList() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = Math.min(
+        this.currentPage * this.pageSize,
+        this.userData.status.length
+      );
+      const score = this.userData.score.slice(start, end);
+      const status = this.userData.status.slice(start, end);
+      const tries = this.userData.tries.slice(start, end);
+      const list = {
+        score,
+        status,
+        tries,
+      };
+      return list;
+    },
+    totalPage() {
+      return Math.ceil(this.userData.status.length / this.pageSize);
+    },
     displayedScore() {
       if (
         this.isReview ||
@@ -33,31 +62,24 @@ export default {
       return this.userData.score[this.currentNumber - 1];
     },
     tries() {
+      return `Tries remaining: ${this.userData.tries[this.currentNumber - 1]}`;
+    },
+    status() {
       if (this.userData.status[this.currentNumber - 1] === "submit-success") {
         return "Correct";
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-wrong"
       ) {
-        if (
-          this.userData.tries[this.currentNumber - 1] === 0 ||
-          this.isReview
-        ) {
-          return "Incorrect";
-        }
+        return "Incorrect";
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-partial"
       ) {
-        if (
-          this.userData.tries[this.currentNumber - 1] === 0 ||
-          this.isReview
-        ) {
-          return "Partially correct";
-        }
+        return "Partially correct";
       }
       if (this.isReview) {
         return "Incorrect";
       }
-      return `Tries remaining: ${this.userData.tries[this.currentNumber - 1]}`;
+      return "";
     },
     triesClass() {
       const { tries, successColor, wrongColor, partialColor } = this.$style;
@@ -67,21 +89,11 @@ export default {
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-wrong"
       ) {
-        if (
-          this.userData.tries[this.currentNumber - 1] === 0 ||
-          this.isReview
-        ) {
-          style.push(wrongColor);
-        }
+        style.push(wrongColor);
       } else if (
         this.userData.status[this.currentNumber - 1] === "submit-partial"
       ) {
-        if (
-          this.userData.tries[this.currentNumber - 1] === 0 ||
-          this.isReview
-        ) {
-          style.push(partialColor);
-        }
+        style.push(partialColor);
       } else if (
         this.isReview &&
         this.userData.tries[this.currentNumber - 1] > 0
@@ -108,27 +120,68 @@ export default {
       }
       return style;
     },
+    next() {
+      if (this.currentPage < this.totalPage) {
+        this.currentPage++;
+      }
+    },
+    prev() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    calculateNumber(val) {
+      return val + 1 + (this.currentPage - 1) * this.pageSize;
+    },
   },
 };
 </script>
 
 <template>
   <div :class="$style.navigation">
-    <p :class="$style.title">Navigation</p>
+    <div :class="$style.header">
+      <p :class="$style.title">Navigation</p>
+      <div :class="$style.pagination" v-if="totalPage > 1">
+        <font-awesome-icon
+          @click="prev"
+          :class="[$style.icon, currentPage === 1 ? $style.disable : '']"
+          icon="chevron-left"
+        />
+        <p :class="$style.page">{{ currentPage }}</p>
+        <font-awesome-icon
+          @click="next"
+          :class="[
+            $style.icon,
+            currentPage === totalPage ? $style.disable : '',
+          ]"
+          icon="chevron-right"
+        />
+      </div>
+    </div>
     <div :class="$style.numberBox">
       <div
-        v-for="(item, idx) in userData.status"
-        :class="numberClass(item, idx + 1)"
+        v-for="(item, idx) in numberList.status"
+        :class="numberClass(item, calculateNumber(idx))"
         :key="idx"
-        @click="$emit('change-number', idx + 1)"
+        @click="$emit('change-number', calculateNumber(idx))"
       >
-        {{ idx + 1 }}
+        {{ calculateNumber(idx) }}
       </div>
     </div>
     <p :class="$style.score">
       Score: <span :class="$style.value">{{ displayedScore }}</span>
     </p>
-    <p :class="triesClass">{{ tries }}</p>
+    <p :class="triesClass">{{ status }}</p>
+    <p
+      v-if="
+        userData.tries[currentNumber - 1] > 0 &&
+        userData.status[currentNumber - 1] !== 'submit-success' &&
+        !isReview
+      "
+      :class="$style.tries"
+    >
+      {{ tries }}
+    </p>
   </div>
 </template>
 
@@ -144,6 +197,40 @@ export default {
   .title {
     font-size: 1.5rem;
     font-weight: bold;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pagination {
+  display: flex;
+
+  &.right {
+    align-self: flex-end;
+  }
+
+  .page {
+    margin: 0 1rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+
+  .icon {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: $primary;
+
+    &:hover {
+      color: lighten($color: $primary, $amount: 10);
+    }
+
+    &.disable {
+      cursor: not-allowed;
+      opacity: 0.3;
+    }
   }
 }
 
