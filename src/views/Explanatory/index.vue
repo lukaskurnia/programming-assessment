@@ -144,8 +144,10 @@ export default {
   }
 
   .reviewBadge {
-    background: #c9c9c9;
-    color: white;
+    // background: #c9c9c9;
+    // color: white;
+    background: linear-gradient(93.02deg, #eabf59 19.98%, #ffdf6a);
+    color: #700000;
     width: 100px;
     text-align: center;
     padding: 0.5rem;
