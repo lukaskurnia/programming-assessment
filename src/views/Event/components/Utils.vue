@@ -538,7 +538,7 @@ export default {
   position: fixed;
   top: 2rem;
   right: 3rem;
-  z-index: 6;
+  z-index: 199;
   animation: showUp ease 0.3s;
 }
 
@@ -681,7 +681,7 @@ export default {
 }
 
 .highlighted {
-  z-index: 10;
+  z-index: 200;
 }
 .tutorialWrapper {
   position: relative;

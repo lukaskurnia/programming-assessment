@@ -276,7 +276,7 @@ export default {
 }
 
 .highlighted {
-  z-index: 10;
+  z-index: 200;
 }
 .tutorialWrapper {
   position: relative;
@@ -287,7 +287,7 @@ export default {
   top: 0;
   left: 0;
   background: rgba(0, 0, 0, 0.75);
-  z-index: 10;
+  z-index: 200;
   position: fixed;
   width: 100vw;
   height: 100vh;
