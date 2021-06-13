@@ -64,7 +64,7 @@ export default {
     },
     addOnScrollEvent() {
       const $header = document.getElementById("header");
-      $header.style.zIndex = window.pageYOffset > 10 ? 5 : 0;
+      $header.style.zIndex = window.pageYOffset > 10 ? 10 : 0;
       $header.style.boxShadow =
         window.pageYOffset > 10 ? "0 2px 8px rgba(0,0,0,0.12)" : "none";
     },
