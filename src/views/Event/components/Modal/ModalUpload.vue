@@ -122,7 +122,7 @@ export default {
   top: 0;
   left: 0;
   background: rgba(0, 0, 0, 0.75);
-  z-index: 7;
+  z-index: 200;
   position: fixed;
   width: 100vw;
   height: 100vh;
